@@ -23,5 +23,93 @@ model Product {
   created_at DateTime @default(now())
   updated_at DateTime @updatedAt
 
+  ProductCategory          ProductCategory?
+  ProductSubcategory       ProductSubcategory?
+  UsersProductNotification UserProductNotification[]
+
   @@map("products")
+}
+
+model Category {
+  id   String @id @default(uuid())
+  name String @unique
+
+  Subcategorys              Subcategory[]
+  ProductsCategory          ProductCategory[]
+  UsersCategoryNotification UserCategoryNotification[]
+
+  @@map("categories")
+}
+
+model Subcategory {
+  id          String @id @default(uuid())
+  name        String
+  category_id String
+
+  category            Category             @relation(fields: [category_id], references: [id])
+  ProductsSubcategory ProductSubcategory[]
+
+  @@map("subcategories")
+}
+
+model ProductCategory {
+  id          String @id @default(uuid())
+  product_id  String @unique
+  category_id String
+
+  product  Product  @relation(fields: [product_id], references: [id])
+  category Category @relation(fields: [category_id], references: [id])
+
+  @@map("products_categories")
+}
+
+model ProductSubcategory {
+  id             String @id @default(uuid())
+  product_id     String @unique
+  subcategory_id String
+
+  product     Product     @relation(fields: [product_id], references: [id])
+  subcategory Subcategory @relation(fields: [subcategory_id], references: [id])
+
+  @@map("products_subcategories")
+}
+
+model Subscription {
+  id       String @id @default(uuid())
+  endpoint String
+  keys     Json
+
+  UsersSubscription UserSubscription[]
+
+  @@map("subscriptions")
+}
+
+model UserSubscription {
+  id              String @id @default(uuid())
+  user_id         String
+  subscription_id String
+
+  subscription Subscription @relation(fields: [subscription_id], references: [id])
+
+  @@map("users_subscriptions")
+}
+
+model UserProductNotification {
+  id         String @id @default(uuid())
+  user_id    String
+  product_id String
+
+  product Product @relation(fields: [product_id], references: [id])
+
+  @@map("users_products_notifications")
+}
+
+model UserCategoryNotification {
+  id          String @id @default(uuid())
+  user_id     String
+  category_id String
+
+  category Category @relation(fields: [category_id], references: [id])
+
+  @@map("users_categories_notifications")
 }

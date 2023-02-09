@@ -1,5 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { PrismaService } from 'src/prisma/prisma.service';
+import { AssignCategoryDto } from './dto/assign-category.dto';
 import { CreateProductDto } from './dto/create-product.dto';
 import { UpdateProductDto } from './dto/update-product.dto';
 
@@ -7,12 +8,8 @@ import { UpdateProductDto } from './dto/update-product.dto';
 export class ProductsService {
   constructor(private prisma: PrismaService) {}
 
-  async create(createProductDto: CreateProductDto) {
-    const product = await this.prisma.product.create({
-      data: createProductDto,
-    });
-
-    return product;
+  create(createProductDto: CreateProductDto) {
+    return this.prisma.product.create({ data: createProductDto });
   }
 
   findAll() {
@@ -32,5 +29,13 @@ export class ProductsService {
 
   remove(id: string) {
     return this.prisma.product.delete({ where: { id } });
+  }
+
+  assignCategory(id: string, assignCategoryDto: AssignCategoryDto) {
+    const { category_id } = assignCategoryDto;
+
+    return this.prisma.productCategory.create({
+      data: { product_id: id, category_id },
+    });
   }
 }
