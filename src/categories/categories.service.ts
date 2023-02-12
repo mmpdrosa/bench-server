@@ -12,11 +12,16 @@ export class CategoriesService {
   }
 
   findAll() {
-    return this.prisma.category.findMany();
+    return this.prisma.category.findMany({
+      include: { subcategorys: { select: { id: true, name: true } } },
+    });
   }
 
   findOne(id: string) {
-    return this.prisma.category.findUnique({ where: { id } });
+    return this.prisma.category.findUniqueOrThrow({
+      where: { id },
+      include: { subcategorys: { select: { id: true, name: true } } },
+    });
   }
 
   update(id: string, updateCategoryDto: UpdateCategoryDto) {

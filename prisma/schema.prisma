@@ -16,16 +16,17 @@ model Product {
   price      Int
   retailer   String
   store      String
-  coupon     String?
   available  Boolean
   html_url   String
   image_url  String
+  dummy      String?
   created_at DateTime @default(now())
   updated_at DateTime @updatedAt
 
-  ProductCategory          ProductCategory?
-  ProductSubcategory       ProductSubcategory?
-  UsersProductNotification UserProductNotification[]
+  productCategory          ProductCategory?
+  productSubcategory       ProductSubcategory?
+  productCoupon            ProductCoupon?
+  usersProductNotification UserProductNotification[]
 
   @@map("products")
 }
@@ -34,9 +35,9 @@ model Category {
   id   String @id @default(uuid())
   name String @unique
 
-  Subcategorys              Subcategory[]
-  ProductsCategory          ProductCategory[]
-  UsersCategoryNotification UserCategoryNotification[]
+  subcategorys              Subcategory[]
+  productsCategory          ProductCategory[]
+  usersCategoryNotification UserCategoryNotification[]
 
   @@map("categories")
 }
@@ -46,9 +47,11 @@ model Subcategory {
   name        String
   category_id String
 
-  category            Category             @relation(fields: [category_id], references: [id])
-  ProductsSubcategory ProductSubcategory[]
+  category Category @relation(fields: [category_id], references: [id], onDelete: Cascade)
 
+  productsSubcategory ProductSubcategory[]
+
+  @@unique([category_id, name])
   @@map("subcategories")
 }
 
@@ -57,8 +60,8 @@ model ProductCategory {
   product_id  String @unique
   category_id String
 
-  product  Product  @relation(fields: [product_id], references: [id])
-  category Category @relation(fields: [category_id], references: [id])
+  product  Product  @relation(fields: [product_id], references: [id], onDelete: Cascade)
+  category Category @relation(fields: [category_id], references: [id], onDelete: Cascade)
 
   @@map("products_categories")
 }
@@ -68,10 +71,34 @@ model ProductSubcategory {
   product_id     String @unique
   subcategory_id String
 
-  product     Product     @relation(fields: [product_id], references: [id])
-  subcategory Subcategory @relation(fields: [subcategory_id], references: [id])
+  product     Product     @relation(fields: [product_id], references: [id], onDelete: Cascade)
+  subcategory Subcategory @relation(fields: [subcategory_id], references: [id], onDelete: Cascade)
 
   @@map("products_subcategories")
+}
+
+model Coupon {
+  id          String  @id @default(uuid())
+  available   Boolean
+  code        String
+  retailer    String
+  store       String?
+  description String?
+
+  productsCoupon ProductCoupon[]
+
+  @@map("coupons")
+}
+
+model ProductCoupon {
+  id         String @id @default(uuid())
+  product_id String @unique
+  coupon_id  String
+
+  product Product @relation(fields: [product_id], references: [id], onDelete: Cascade)
+  coupon  Coupon  @relation(fields: [coupon_id], references: [id], onDelete: Cascade)
+
+  @@map("products_coupons")
 }
 
 model Subscription {
@@ -79,7 +106,7 @@ model Subscription {
   endpoint String
   keys     Json
 
-  UsersSubscription UserSubscription[]
+  usersSubscription UserSubscription[]
 
   @@map("subscriptions")
 }
@@ -89,7 +116,7 @@ model UserSubscription {
   user_id         String
   subscription_id String
 
-  subscription Subscription @relation(fields: [subscription_id], references: [id])
+  subscription Subscription @relation(fields: [subscription_id], references: [id], onDelete: Cascade)
 
   @@map("users_subscriptions")
 }
@@ -99,7 +126,7 @@ model UserProductNotification {
   user_id    String
   product_id String
 
-  product Product @relation(fields: [product_id], references: [id])
+  product Product @relation(fields: [product_id], references: [id], onDelete: Cascade)
 
   @@map("users_products_notifications")
 }
@@ -109,7 +136,7 @@ model UserCategoryNotification {
   user_id     String
   category_id String
 
-  category Category @relation(fields: [category_id], references: [id])
+  category Category @relation(fields: [category_id], references: [id], onDelete: Cascade)
 
   @@map("users_categories_notifications")
 }

@@ -1,14 +1,6 @@
-import {
-  Controller,
-  Get,
-  Post,
-  Body,
-  Patch,
-  Param,
-  Delete,
-} from '@nestjs/common';
-import { SubscriptionsService } from './subscriptions.service';
+import { Body, Controller, Delete, Get, Param, Post } from '@nestjs/common';
 import { CreateSubscriptionDto } from './dto/create-subscription.dto';
+import { SubscriptionsService } from './subscriptions.service';
 
 @Controller('subscriptions')
 export class SubscriptionsController {

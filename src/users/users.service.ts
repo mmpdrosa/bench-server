@@ -1,26 +1,38 @@
-import { Injectable } from '@nestjs/common';
+import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
+import { auth } from 'src/config/firebase';
 import { CreateUserDto } from './dto/create-user.dto';
-import { UpdateUserDto } from './dto/update-user.dto';
 
 @Injectable()
 export class UsersService {
-  create(createUserDto: CreateUserDto) {
-    return 'This action adds a new user';
+  async create({ email, password, photo_url, username }: CreateUserDto) {
+    try {
+      const user = await auth.getUserByEmail(email);
+
+      if (user) {
+        throw new HttpException(
+          'This email address is already in use',
+          HttpStatus.CONFLICT,
+        );
+      }
+    } catch {}
+
+    await auth.createUser({
+      displayName: username,
+      email,
+      password,
+      photoURL: photo_url,
+    });
   }
 
   findAll() {
-    return `This action returns all users`;
+    return auth.listUsers();
   }
 
-  findOne(id: number) {
-    return `This action returns a #${id} user`;
+  findOne(id: string) {
+    return auth.getUser(id);
   }
 
-  update(id: number, updateUserDto: UpdateUserDto) {
-    return `This action updates a #${id} user`;
-  }
-
-  remove(id: number) {
-    return `This action removes a #${id} user`;
+  remove(id: string) {
+    return auth.deleteUser(id);
   }
 }

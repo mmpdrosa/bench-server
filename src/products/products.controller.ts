@@ -8,7 +8,6 @@ import {
   Post,
 } from '@nestjs/common';
 import { Product } from '@prisma/client';
-import { AssignCategoryDto } from './dto/assign-category.dto';
 import { CreateProductDto } from './dto/create-product.dto';
 import { UpdateProductDto } from './dto/update-product.dto';
 import { ProductsService } from './products.service';
@@ -40,13 +39,5 @@ export class ProductsController {
   @Delete(':id')
   remove(@Param('id') id: string) {
     return this.productsService.remove(id);
-  }
-
-  @Post(':id/category')
-  assignCategory(
-    @Param('id') id: string,
-    @Body() assignCategoryDto: AssignCategoryDto,
-  ) {
-    return this.productsService.assignCategory(id, assignCategoryDto);
   }
 }
