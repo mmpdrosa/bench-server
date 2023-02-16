@@ -42,7 +42,7 @@ export class ProductsController {
     return this.productsService.remove(id);
   }
 
-  @Post(':product_id/retailers/retailer_id')
+  @Post(':product_id/retailers/:retailer_id')
   assignRetailer(
     @Param('product_id') product_id: string,
     @Param('retailer_id') retailer_id: string,

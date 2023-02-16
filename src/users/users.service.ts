@@ -1,38 +1,63 @@
-import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
+import { ConflictException, Injectable } from '@nestjs/common';
+import { UserRecord } from 'firebase-admin/auth';
 import { auth } from 'src/config/firebase';
 import { CreateUserDto } from './dto/create-user.dto';
 
 @Injectable()
 export class UsersService {
+  private mapUser(user: UserRecord) {
+    const { uid, displayName, email, customClaims } = user;
+    return { uid, username: displayName, email, role: customClaims };
+  }
+
   async create({ email, password, photo_url, username }: CreateUserDto) {
     try {
       const user = await auth.getUserByEmail(email);
 
       if (user) {
-        throw new HttpException(
-          'This email address is already in use',
-          HttpStatus.CONFLICT,
-        );
+        throw new ConflictException('This email address is already in use');
       }
-    } catch {}
+    } catch (err) {
+      if (err.code !== 'auth/user-not-found') {
+        throw err;
+      }
+    }
 
-    await auth.createUser({
+    const user = await auth.createUser({
       displayName: username,
       email,
       password,
       photoURL: photo_url,
     });
+
+    return this.mapUser(user);
   }
 
-  findAll() {
-    return auth.listUsers();
+  async findAll() {
+    try {
+      const { users } = await auth.listUsers();
+
+      return users.map((user) => this.mapUser(user));
+    } catch (err) {
+      throw err;
+    }
   }
 
-  findOne(id: string) {
-    return auth.getUser(id);
+  async findOne(id: string) {
+    try {
+      const user = await auth.getUser(id);
+
+      return this.mapUser(user);
+    } catch (err) {
+      throw err;
+    }
   }
 
   remove(id: string) {
-    return auth.deleteUser(id);
+    try {
+      return auth.deleteUser(id);
+    } catch (err) {
+      throw err;
+    }
   }
 }
