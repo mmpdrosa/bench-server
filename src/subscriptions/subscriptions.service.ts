@@ -1,20 +1,22 @@
 import { Injectable } from '@nestjs/common';
-import { PrismaService } from 'src/prisma/prisma.service';
+import { PrismaService } from 'nestjs-prisma';
 import { CreateSubscriptionDto } from './dto/create-subscription.dto';
+import { ToogleProductNotificationDto } from './dto/toogle-product-notification.dto';
 
 @Injectable()
 export class SubscriptionsService {
   constructor(private prisma: PrismaService) {}
 
-  async create(createSubscriptionDto: CreateSubscriptionDto) {
+  async create(user_id: string, createSubscriptionDto: CreateSubscriptionDto) {
     const { endpoint, keys } = createSubscriptionDto;
 
     const subscription = await this.prisma.subscription.create({
-      data: { endpoint, keys: JSON.stringify(keys) },
+      data: { user_id, endpoint, keys: JSON.stringify(keys) },
     });
 
     return {
       id: subscription.id,
+      user_id: subscription.user_id,
       endpoint: subscription.endpoint,
       keys: JSON.parse(subscription.keys as string),
     };
@@ -33,22 +35,37 @@ export class SubscriptionsService {
     });
   }
 
-  async findOne(id: string) {
-    const subscription = await this.prisma.subscription.findUnique({
-      where: { id },
-    });
-
-    if (!subscription) {
-      return {};
-    }
-
-    return {
-      ...subscription,
-      keys: JSON.parse(subscription.keys as string),
-    };
+  async removeByUserId(id: string) {
+    return this.prisma.subscription.deleteMany({ where: { user_id: id } });
   }
 
-  remove(id: string) {
-    return this.prisma.subscription.delete({ where: { id } });
+  async publicKey() {
+    return process.env.PUBLIC_VAPID_KEY;
+  }
+
+  async toogleProduct(
+    user_id: string,
+    product_id: string,
+    toogleProductNotificationDto: ToogleProductNotificationDto,
+  ) {
+    const { price } = toogleProductNotificationDto;
+
+    await this.prisma.subscription.findFirstOrThrow({
+      where: { user_id },
+    });
+
+    const notification = await this.prisma.userProductNotification.findFirst({
+      where: { user_id, product_id },
+    });
+
+    if (notification) {
+      return await this.prisma.userProductNotification.delete({
+        where: { id: notification.id },
+      });
+    } else {
+      return await this.prisma.userProductNotification.create({
+        data: { user_id, price, product: { connect: { id: product_id } } },
+      });
+    }
   }
 }

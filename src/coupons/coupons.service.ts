@@ -1,5 +1,5 @@
 import { Injectable } from '@nestjs/common';
-import { PrismaService } from 'src/prisma/prisma.service';
+import { PrismaService } from 'nestjs-prisma';
 import { CreateCouponDto } from './dto/create-coupon.dto';
 import { UpdateCouponDto } from './dto/update-coupon.dto';
 
@@ -12,11 +12,30 @@ export class CouponsService {
   }
 
   findAll() {
-    return this.prisma.coupon.findMany();
+    return this.prisma.coupon.findMany({
+      select: {
+        id: true,
+        available: true,
+        code: true,
+        description: true,
+        store: true,
+        retailer: true,
+      },
+    });
   }
 
   findOne(id: string) {
-    return this.prisma.coupon.findUniqueOrThrow({ where: { id } });
+    return this.prisma.coupon.findUniqueOrThrow({
+      where: { id },
+      select: {
+        id: true,
+        available: true,
+        code: true,
+        description: true,
+        store: true,
+        retailer: true,
+      },
+    });
   }
 
   update(id: string, updateCouponDto: UpdateCouponDto) {

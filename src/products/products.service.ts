@@ -1,28 +1,29 @@
-import { Injectable } from '@nestjs/common';
-import { PrismaService } from 'src/prisma/prisma.service';
+import { Injectable, NotAcceptableException } from '@nestjs/common';
+import { PrismaService } from 'nestjs-prisma';
+import { AssignRetailerDto } from './dto/assign-retailer.dto';
 import { CreateProductDto } from './dto/create-product.dto';
+import { UpdateProductRetailerDto } from './dto/update-product-retailer.dto';
 import { UpdateProductDto } from './dto/update-product.dto';
 
 @Injectable()
 export class ProductsService {
   constructor(private prisma: PrismaService) {}
 
-  create({
-    category_id,
-    subcategory_id,
-    coupon_id,
-    ...data
-  }: CreateProductDto) {
-    console.log();
+  private mapWithCategoryAndSubcategory(product) {
+    const { productCategory, productSubcategory, ...data } = product;
+    const category = productCategory?.category ?? null;
+    const subcategory = productSubcategory?.subcategory ?? null;
+    return { ...data, category, subcategory };
+  }
 
-    return this.prisma.product.create({
+  async create({ category_id, subcategory_id, ...data }: CreateProductDto) {
+    const product = await this.prisma.product.create({
       data: {
         ...data,
         productCategory: category_id ? { create: { category_id } } : undefined,
         productSubcategory: subcategory_id
           ? { create: { subcategory_id } }
           : undefined,
-        productCoupon: coupon_id ? { create: { coupon_id } } : undefined,
       },
       include: {
         productCategory: {
@@ -31,15 +32,14 @@ export class ProductsService {
         productSubcategory: {
           select: { subcategory: true },
         },
-        productCoupon: {
-          select: { coupon: true },
-        },
       },
     });
+
+    return this.mapWithCategoryAndSubcategory(product);
   }
 
-  findAll() {
-    return this.prisma.product.findMany({
+  async findAll() {
+    const products = await this.prisma.product.findMany({
       include: {
         productCategory: {
           select: { category: true },
@@ -47,15 +47,16 @@ export class ProductsService {
         productSubcategory: {
           select: { subcategory: true },
         },
-        productCoupon: {
-          select: { coupon: true },
-        },
       },
     });
+
+    return products.map((product) =>
+      this.mapWithCategoryAndSubcategory(product),
+    );
   }
 
-  findOne(id: string) {
-    return this.prisma.product.findUniqueOrThrow({
+  async findOne(id: string) {
+    const product = await this.prisma.product.findUniqueOrThrow({
       where: { id },
       include: {
         productCategory: {
@@ -64,39 +65,44 @@ export class ProductsService {
         productSubcategory: {
           select: { subcategory: true },
         },
-        productCoupon: {
-          select: { coupon: true },
-        },
       },
     });
+
+    return this.mapWithCategoryAndSubcategory(product);
   }
 
-  update(
+  async update(
     id: string,
-    { category_id, subcategory_id, coupon_id, ...data }: UpdateProductDto,
+    { category_id, subcategory_id, ...data }: UpdateProductDto,
   ) {
-    return this.prisma.product.update({
+    const { category, subcategory } = await this.findOne(id);
+
+    let productCategory;
+
+    if (category_id === null && category) {
+      productCategory = { delete: true };
+    } else if (category_id !== undefined) {
+      productCategory = category
+        ? { update: { category_id } }
+        : { create: { category_id } };
+    }
+
+    let productSubcategory;
+
+    if (subcategory_id === null && subcategory) {
+      productSubcategory = { delete: true };
+    } else if (subcategory_id !== undefined) {
+      productSubcategory = subcategory
+        ? { update: { subcategory_id } }
+        : { create: { subcategory_id } };
+    }
+
+    const product = await this.prisma.product.update({
       where: { id },
       data: {
         ...data,
-        productCategory:
-          category_id === null
-            ? { delete: true }
-            : category_id
-            ? { update: { category_id } }
-            : undefined,
-        productSubcategory:
-          subcategory_id === null
-            ? { delete: true }
-            : subcategory_id
-            ? { update: { subcategory_id } }
-            : undefined,
-        productCoupon:
-          coupon_id === null
-            ? { delete: true }
-            : coupon_id
-            ? { update: { coupon_id } }
-            : undefined,
+        productCategory,
+        productSubcategory,
       },
       include: {
         productCategory: {
@@ -105,14 +111,130 @@ export class ProductsService {
         productSubcategory: {
           select: { subcategory: true },
         },
-        productCoupon: {
-          select: { coupon: true },
-        },
       },
     });
+
+    return this.mapWithCategoryAndSubcategory(product);
   }
 
   remove(id: string) {
     return this.prisma.product.delete({ where: { id } });
+  }
+
+  assignRetailer(
+    product_id: string,
+    retailer_id: string,
+    assignRetailerDto: AssignRetailerDto,
+  ) {
+    return this.prisma.productRetailer.create({
+      data: { product_id, retailer_id, ...assignRetailerDto },
+    });
+  }
+
+  findAllRetailers(product_id: string) {
+    return this.prisma.productRetailer.findMany({
+      where: { product_id },
+      select: {
+        price: true,
+        store: true,
+        available: true,
+        html_url: true,
+        dummy: true,
+        created_at: true,
+        updated_at: true,
+        retailer: true,
+        coupon: true,
+      },
+    });
+  }
+
+  async updateProductRetailerRelation(
+    product_id: string,
+    retailer_id: string,
+    { coupon_id, ...data }: UpdateProductRetailerDto,
+  ) {
+    if (coupon_id) {
+      const coupon = await this.prisma.coupon.findUniqueOrThrow({
+        where: { id: coupon_id },
+      });
+
+      if (coupon.retailer_id !== retailer_id) {
+        throw new NotAcceptableException();
+      }
+    }
+
+    return this.prisma.productRetailer.update({
+      where: {
+        product_id_retailer_id: {
+          product_id,
+          retailer_id,
+        },
+      },
+      data: {
+        ...data,
+        coupon_id,
+      },
+    });
+  }
+
+  async findProductsWithMinPrice() {
+    const products = await this.prisma.productRetailer.findMany({
+      select: {
+        price: true,
+        store: true,
+        available: true,
+        html_url: true,
+        dummy: true,
+        created_at: true,
+        updated_at: true,
+        product: {
+          include: {
+            productCategory: { include: { category: true } },
+            productSubcategory: { include: { subcategory: true } },
+          },
+        },
+        retailer: true,
+        coupon: true,
+      },
+    });
+
+    const res = products.map(
+      ({
+        product: { id, title, image_url, productCategory, productSubcategory },
+        ...data
+      }) => {
+        return {
+          id,
+          title,
+          image_url,
+          ...data,
+          category: productCategory ? productCategory.category : null,
+          subcategory: productSubcategory
+            ? productSubcategory.subcategory
+            : null,
+        };
+      },
+    );
+
+    return res.reduce((acc, curr) => {
+      const existingProduct = acc.find((product) => product.id === curr.id);
+      if (!existingProduct) {
+        acc.push(curr);
+      } else if (curr.price < existingProduct.price) {
+        acc.splice(acc.indexOf(existingProduct), 1, curr);
+      }
+      return acc;
+    }, []);
+  }
+
+  removeProductRetailerRelation(product_id: string, retailer_id: string) {
+    return this.prisma.productRetailer.delete({
+      where: {
+        product_id_retailer_id: {
+          product_id,
+          retailer_id,
+        },
+      },
+    });
   }
 }

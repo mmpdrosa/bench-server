@@ -10,25 +10,67 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
+model Retailer {
+  id       String @id @default(uuid())
+  name     String @unique
+  html_url String
+
+  productsRetailer ProductRetailer[]
+  coupons          Coupon[]
+
+  @@map("retailers")
+}
+
 model Product {
-  id         String   @id @default(uuid())
-  title      String
-  price      Int
-  retailer   String
-  store      String
-  available  Boolean
-  html_url   String
-  image_url  String
-  dummy      String?
-  created_at DateTime @default(now())
-  updated_at DateTime @updatedAt
+  id        String @id @default(uuid())
+  title     String
+  image_url String
 
   productCategory          ProductCategory?
   productSubcategory       ProductSubcategory?
-  productCoupon            ProductCoupon?
+  productRetailers         ProductRetailer[]
   usersProductNotification UserProductNotification[]
+  priceHistory             PriceHistory[]
 
   @@map("products")
+}
+
+model Coupon {
+  id            String  @id @default(uuid())
+  available     Boolean
+  code          String
+  discount      String
+  minimum_spend Int?
+  store         String?
+  description   String?
+  retailer_id   String
+
+  retailer Retailer @relation(fields: [retailer_id], references: [id], onDelete: Cascade)
+
+  productsRetailer ProductRetailer[]
+
+  @@map("coupons")
+}
+
+model ProductRetailer {
+  id          String   @id @default(uuid())
+  price       Int
+  store       String?
+  available   Boolean
+  html_url    String
+  dummy       String?
+  created_at  DateTime @default(now())
+  updated_at  DateTime @updatedAt
+  product_id  String
+  retailer_id String
+  coupon_id   String?
+
+  product  Product  @relation(fields: [product_id], references: [id], onDelete: Cascade)
+  retailer Retailer @relation(fields: [retailer_id], references: [id], onDelete: Cascade)
+  coupon   Coupon?  @relation(fields: [coupon_id], references: [id], onDelete: SetNull)
+
+  @@unique([product_id, retailer_id])
+  @@map("products_retailers")
 }
 
 model Category {
@@ -77,52 +119,30 @@ model ProductSubcategory {
   @@map("products_subcategories")
 }
 
-model Coupon {
-  id          String  @id @default(uuid())
-  available   Boolean
-  code        String
-  retailer    String
-  store       String?
-  description String?
-
-  productsCoupon ProductCoupon[]
-
-  @@map("coupons")
-}
-
-model ProductCoupon {
-  id         String @id @default(uuid())
-  product_id String @unique
-  coupon_id  String
+model PriceHistory {
+  id         String   @id @default(uuid())
+  price      Int
+  date       DateTime
+  product_id String
 
   product Product @relation(fields: [product_id], references: [id], onDelete: Cascade)
-  coupon  Coupon  @relation(fields: [coupon_id], references: [id], onDelete: Cascade)
 
-  @@map("products_coupons")
+  @@map("prices_history")
 }
 
 model Subscription {
   id       String @id @default(uuid())
+  user_id  String
   endpoint String
   keys     Json
 
-  usersSubscription UserSubscription[]
-
+  @@unique([user_id, endpoint])
   @@map("subscriptions")
-}
-
-model UserSubscription {
-  id              String @id @default(uuid())
-  user_id         String
-  subscription_id String
-
-  subscription Subscription @relation(fields: [subscription_id], references: [id], onDelete: Cascade)
-
-  @@map("users_subscriptions")
 }
 
 model UserProductNotification {
   id         String @id @default(uuid())
+  price      Int
   user_id    String
   product_id String
 

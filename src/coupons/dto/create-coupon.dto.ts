@@ -1,4 +1,11 @@
-import { IsBoolean, IsNotEmpty, IsOptional, IsString } from 'class-validator';
+import {
+  IsBoolean,
+  IsInt,
+  IsNotEmpty,
+  IsNumber,
+  IsOptional,
+  IsString,
+} from 'class-validator';
 
 export class CreateCouponDto {
   @IsNotEmpty()
@@ -11,13 +18,22 @@ export class CreateCouponDto {
 
   @IsNotEmpty()
   @IsString()
-  retailer: string;
+  discount: string;
+
+  @IsOptional()
+  @IsNumber()
+  @IsInt()
+  minimum_spend?: number;
+
+  @IsOptional()
+  @IsString()
+  description?: string;
 
   @IsOptional()
   @IsString()
   store?: string;
 
-  @IsOptional()
+  @IsNotEmpty()
   @IsString()
-  description?: string;
+  retailer_id: string;
 }

@@ -1,26 +1,33 @@
-import { HttpStatus, Module } from '@nestjs/common';
+import {
+  HttpStatus,
+  MiddlewareConsumer,
+  Module,
+  NestModule,
+  RequestMethod,
+} from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
 import { APP_FILTER, HttpAdapterHost } from '@nestjs/core';
 import { PrismaClientExceptionFilter } from 'nestjs-prisma';
 import { AppController } from './app.controller';
+import { AuthMiddleware } from './auth/auth.middleware';
 import { CategoriesModule } from './categories/categories.module';
 import { CouponsModule } from './coupons/coupons.module';
-import { PrismaModule } from './prisma/prisma.module';
 import { ProductsModule } from './products/products.module';
 import { SubcategoriesModule } from './subcategories/subcategories.module';
 import { SubscriptionsModule } from './subscriptions/subscriptions.module';
 import { UsersModule } from './users/users.module';
+import { RetailersModule } from './retailers/retailers.module';
 
 @Module({
   imports: [
     ConfigModule.forRoot(),
-    PrismaModule,
     UsersModule,
     ProductsModule,
     CategoriesModule,
     SubscriptionsModule,
     SubcategoriesModule,
     CouponsModule,
+    RetailersModule,
   ],
   controllers: [AppController],
   providers: [
@@ -38,4 +45,14 @@ import { UsersModule } from './users/users.module';
     },
   ],
 })
-export class AppModule {}
+export class AppModule implements NestModule {
+  configure(consumer: MiddlewareConsumer) {
+    consumer
+      .apply(AuthMiddleware)
+      .forRoutes(
+        { path: 'subscriptions', method: RequestMethod.POST },
+        { path: 'subscriptions', method: RequestMethod.DELETE },
+        'subscriptions/(*)',
+      );
+  }
+}
