@@ -22,9 +22,10 @@ model Retailer {
 }
 
 model Product {
-  id        String @id @default(uuid())
-  title     String
-  image_url String
+  id              String @id @default(uuid())
+  title           String
+  reference_price Int?
+  image_url       String
 
   productCategory          ProductCategory?
   productSubcategory       ProductSubcategory?
@@ -49,6 +50,7 @@ model Coupon {
 
   productsRetailer ProductRetailer[]
 
+  @@unique([code, retailer_id])
   @@map("coupons")
 }
 
@@ -77,7 +79,7 @@ model Category {
   id   String @id @default(uuid())
   name String @unique
 
-  subcategorys              Subcategory[]
+  subcategories             Subcategory[]
   productsCategory          ProductCategory[]
   usersCategoryNotification UserCategoryNotification[]
 

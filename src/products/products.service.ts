@@ -200,12 +200,20 @@ export class ProductsService {
 
     const res = products.map(
       ({
-        product: { id, title, image_url, productCategory, productSubcategory },
+        product: {
+          id,
+          title,
+          reference_price,
+          image_url,
+          productCategory,
+          productSubcategory,
+        },
         ...data
       }) => {
         return {
           id,
           title,
+          reference_price,
           image_url,
           ...data,
           category: productCategory ? productCategory.category : null,

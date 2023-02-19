@@ -29,4 +29,8 @@ export class RetailersService {
   remove(id: string) {
     return this.prisma.retailer.delete({ where: { id } });
   }
+
+  findAllCoupons(retailer_id: string) {
+    return this.prisma.coupon.findMany({ where: { retailer_id } });
+  }
 }

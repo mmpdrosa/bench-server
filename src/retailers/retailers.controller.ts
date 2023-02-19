@@ -42,4 +42,11 @@ export class RetailersController {
   remove(@Param('id') id: string) {
     return this.retailersService.remove(id);
   }
+
+  @Get(':retailer_id/coupons')
+  findAllCoupons(@Param('retailer_id') retailer_id: string) {
+    console.log(retailer_id);
+
+    return this.retailersService.findAllCoupons(retailer_id);
+  }
 }
