@@ -45,8 +45,6 @@ export class RetailersController {
 
   @Get(':retailer_id/coupons')
   findAllCoupons(@Param('retailer_id') retailer_id: string) {
-    console.log(retailer_id);
-
     return this.retailersService.findAllCoupons(retailer_id);
   }
 }
