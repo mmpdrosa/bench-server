@@ -43,6 +43,11 @@ export class RetailersController {
     return this.retailersService.remove(id);
   }
 
+  @Get(':retailer_id/products')
+  findAllProducts(@Param('retailer_id') retailer_id: string) {
+    return this.retailersService.findAllProducts(retailer_id);
+  }
+
   @Get(':retailer_id/coupons')
   findAllCoupons(@Param('retailer_id') retailer_id: string) {
     return this.retailersService.findAllCoupons(retailer_id);

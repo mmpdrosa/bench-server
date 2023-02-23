@@ -30,6 +30,56 @@ export class RetailersService {
     return this.prisma.retailer.delete({ where: { id } });
   }
 
+  async findAllProducts(retailer_id: string) {
+    const products = await this.prisma.productRetailer.findMany({
+      where: {
+        retailer_id,
+      },
+      select: {
+        price: true,
+        store: true,
+        available: true,
+        html_url: true,
+        dummy: true,
+        created_at: true,
+        updated_at: true,
+        product: {
+          include: {
+            productCategory: { include: { category: true } },
+            productSubcategory: { include: { subcategory: true } },
+          },
+        },
+        coupon: true,
+      },
+    });
+
+    return products.map(
+      ({
+        product: {
+          id,
+          title,
+          reference_price,
+          image_url,
+          productCategory,
+          productSubcategory,
+        },
+        ...data
+      }) => {
+        return {
+          id,
+          title,
+          reference_price,
+          image_url,
+          ...data,
+          category: productCategory ? productCategory.category : null,
+          subcategory: productSubcategory
+            ? productSubcategory.subcategory
+            : null,
+        };
+      },
+    );
+  }
+
   findAllCoupons(retailer_id: string) {
     return this.prisma.coupon.findMany({ where: { retailer_id } });
   }
