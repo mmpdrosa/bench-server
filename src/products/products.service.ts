@@ -177,8 +177,19 @@ export class ProductsService {
     });
   }
 
-  async findProductsWithMinPrice() {
+  async findProductsWithMinPrice(category_id: string, subcategory_id: string) {
+    let where = {};
+
+    if (category_id !== 'all') {
+      where = { product: { productCategory: { category_id } } };
+    }
+
+    if (subcategory_id !== 'all') {
+      where = { product: { productSubcategory: { subcategory_id } } };
+    }
+
     const products = await this.prisma.productRetailer.findMany({
+      where,
       select: {
         price: true,
         store: true,

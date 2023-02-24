@@ -4,8 +4,10 @@ import {
   Delete,
   Get,
   Param,
+  ParseUUIDPipe,
   Patch,
   Post,
+  Query,
 } from '@nestjs/common';
 import { AssignRetailerDto } from './dto/assign-retailer.dto';
 import { CreateProductDto } from './dto/create-product.dto';
@@ -28,24 +30,27 @@ export class ProductsController {
   }
 
   @Get(':id')
-  findOne(@Param('id') id: string) {
+  findOne(@Param('id', ParseUUIDPipe) id: string) {
     return this.productsService.findOne(id);
   }
 
   @Patch(':id')
-  update(@Param('id') id: string, @Body() updateProductDto: UpdateProductDto) {
+  update(
+    @Param('id', ParseUUIDPipe) id: string,
+    @Body() updateProductDto: UpdateProductDto,
+  ) {
     return this.productsService.update(id, updateProductDto);
   }
 
   @Delete(':id')
-  remove(@Param('id') id: string) {
+  remove(@Param('id', ParseUUIDPipe) id: string) {
     return this.productsService.remove(id);
   }
 
   @Post(':product_id/retailers/:retailer_id')
   assignRetailer(
-    @Param('product_id') product_id: string,
-    @Param('retailer_id') retailer_id: string,
+    @Param('product_id', ParseUUIDPipe) product_id: string,
+    @Param('retailer_id', ParseUUIDPipe) retailer_id: string,
     @Body() assignRetailerDto: AssignRetailerDto,
   ) {
     return this.productsService.assignRetailer(
@@ -56,14 +61,14 @@ export class ProductsController {
   }
 
   @Get(':product_id/retailers')
-  findAllRetailers(@Param('product_id') product_id: string) {
+  findAllRetailers(@Param('product_id', ParseUUIDPipe) product_id: string) {
     return this.productsService.findAllRetailers(product_id);
   }
 
   @Patch(':product_id/retailers/:retailer_id')
   updateProductRetailerRelation(
-    @Param('product_id') product_id: string,
-    @Param('retailer_id') retailer_id: string,
+    @Param('product_id', ParseUUIDPipe) product_id: string,
+    @Param('retailer_id', ParseUUIDPipe) retailer_id: string,
     @Body() updateProductRetailerDto: UpdateProductRetailerDto,
   ) {
     return this.productsService.updateProductRetailerRelation(
@@ -74,14 +79,17 @@ export class ProductsController {
   }
 
   @Get('with-min-price/for-all')
-  findProductsWithMinPrice() {
-    return this.productsService.findProductsWithMinPrice();
+  findProductsWithMinPrice(
+    @Query('category') category = 'all',
+    @Query('subcategory') subcategory = 'all',
+  ) {
+    return this.productsService.findProductsWithMinPrice(category, subcategory);
   }
 
   @Delete(':product_id/retailers/:retailer_id')
   removeProductRetailerRelation(
-    @Param('product_id') product_id: string,
-    @Param('retailer_id') retailer_id: string,
+    @Param('product_id', ParseUUIDPipe) product_id: string,
+    @Param('retailer_id', ParseUUIDPipe) retailer_id: string,
   ) {
     return this.productsService.removeProductRetailerRelation(
       product_id,

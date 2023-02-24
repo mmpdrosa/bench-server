@@ -4,6 +4,7 @@ import {
   Delete,
   Get,
   Param,
+  ParseUUIDPipe,
   Patch,
   Post,
 } from '@nestjs/common';
@@ -26,30 +27,30 @@ export class RetailersController {
   }
 
   @Get(':id')
-  findOne(@Param('id') id: string) {
+  findOne(@Param('id', ParseUUIDPipe) id: string) {
     return this.retailersService.findOne(id);
   }
 
   @Patch(':id')
   update(
-    @Param('id') id: string,
+    @Param('id', ParseUUIDPipe) id: string,
     @Body() updateRetailerDto: UpdateRetailerDto,
   ) {
     return this.retailersService.update(id, updateRetailerDto);
   }
 
   @Delete(':id')
-  remove(@Param('id') id: string) {
+  remove(@Param('id', ParseUUIDPipe) id: string) {
     return this.retailersService.remove(id);
   }
 
   @Get(':retailer_id/products')
-  findAllProducts(@Param('retailer_id') retailer_id: string) {
+  findAllProducts(@Param('retailer_id', ParseUUIDPipe) retailer_id: string) {
     return this.retailersService.findAllProducts(retailer_id);
   }
 
   @Get(':retailer_id/coupons')
-  findAllCoupons(@Param('retailer_id') retailer_id: string) {
+  findAllCoupons(@Param('retailer_id', ParseUUIDPipe) retailer_id: string) {
     return this.retailersService.findAllCoupons(retailer_id);
   }
 }
