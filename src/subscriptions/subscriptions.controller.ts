@@ -8,6 +8,7 @@ import {
   Post,
   Req,
 } from '@nestjs/common';
+
 import { CreateSubscriptionDto } from './dto/create-subscription.dto';
 import { ToogleProductNotificationDto } from './dto/toogle-product-notification.dto';
 import { SubscriptionsService } from './subscriptions.service';

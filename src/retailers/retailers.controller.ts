@@ -8,6 +8,7 @@ import {
   Patch,
   Post,
 } from '@nestjs/common';
+
 import { CreateRetailerDto } from './dto/create-retailer.dto';
 import { UpdateRetailerDto } from './dto/update-retailer.dto';
 import { RetailersService } from './retailers.service';

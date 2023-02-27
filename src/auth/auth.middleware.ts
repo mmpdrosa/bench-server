@@ -4,6 +4,7 @@ import {
   UnauthorizedException,
 } from '@nestjs/common';
 import { NextFunction } from 'express';
+
 import { auth } from 'src/config/firebase';
 
 @Injectable()

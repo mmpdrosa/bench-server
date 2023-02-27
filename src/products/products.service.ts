@@ -1,5 +1,6 @@
 import { Injectable, NotAcceptableException } from '@nestjs/common';
 import { PrismaService } from 'nestjs-prisma';
+
 import { AssignRetailerDto } from './dto/assign-retailer.dto';
 import { CreateProductDto } from './dto/create-product.dto';
 import { UpdateProductRetailerDto } from './dto/update-product-retailer.dto';
@@ -177,15 +178,32 @@ export class ProductsService {
     });
   }
 
-  async findProductsWithMinPrice(category_id: string, subcategory_id: string) {
-    let where = {};
+  async findProductsWithMinPrice(
+    search: string,
+    category_id: string,
+    subcategory_id: string,
+  ) {
+    const where = { product: {} };
+
+    if (search !== 'all') {
+      where.product = {
+        ...where.product,
+        title: { contains: search, mode: 'insensitive' },
+      };
+    }
 
     if (category_id !== 'all') {
-      where = { product: { productCategory: { category_id } } };
+      where.product = {
+        ...where.product,
+        productCategory: { category_id },
+      };
     }
 
     if (subcategory_id !== 'all') {
-      where = { product: { productSubcategory: { subcategory_id } } };
+      where.product = {
+        ...where.product,
+        productSubcategory: { subcategory_id },
+      };
     }
 
     const products = await this.prisma.productRetailer.findMany({

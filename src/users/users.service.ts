@@ -1,5 +1,6 @@
 import { ConflictException, Injectable } from '@nestjs/common';
 import { UserRecord } from 'firebase-admin/auth';
+
 import { auth } from 'src/config/firebase';
 import { CreateUserDto } from './dto/create-user.dto';
 

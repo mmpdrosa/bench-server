@@ -1,5 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { PrismaService } from 'nestjs-prisma';
+
 import { CreateSubscriptionDto } from './dto/create-subscription.dto';
 import { ToogleProductNotificationDto } from './dto/toogle-product-notification.dto';
 

@@ -9,6 +9,7 @@ import {
   Post,
   Query,
 } from '@nestjs/common';
+
 import { AssignRetailerDto } from './dto/assign-retailer.dto';
 import { CreateProductDto } from './dto/create-product.dto';
 import { UpdateProductRetailerDto } from './dto/update-product-retailer.dto';
@@ -80,10 +81,15 @@ export class ProductsController {
 
   @Get('with-min-price/for-all')
   findProductsWithMinPrice(
+    @Query('search') search = 'all',
     @Query('category') category = 'all',
     @Query('subcategory') subcategory = 'all',
   ) {
-    return this.productsService.findProductsWithMinPrice(category, subcategory);
+    return this.productsService.findProductsWithMinPrice(
+      search,
+      category,
+      subcategory,
+    );
   }
 
   @Delete(':product_id/retailers/:retailer_id')

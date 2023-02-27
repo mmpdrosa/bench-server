@@ -8,15 +8,16 @@ import {
 import { ConfigModule } from '@nestjs/config';
 import { APP_FILTER, HttpAdapterHost } from '@nestjs/core';
 import { PrismaClientExceptionFilter } from 'nestjs-prisma';
+
 import { AppController } from './app.controller';
 import { AuthMiddleware } from './auth/auth.middleware';
 import { CategoriesModule } from './categories/categories.module';
 import { CouponsModule } from './coupons/coupons.module';
 import { ProductsModule } from './products/products.module';
+import { RetailersModule } from './retailers/retailers.module';
 import { SubcategoriesModule } from './subcategories/subcategories.module';
 import { SubscriptionsModule } from './subscriptions/subscriptions.module';
 import { UsersModule } from './users/users.module';
-import { RetailersModule } from './retailers/retailers.module';
 
 @Module({
   imports: [

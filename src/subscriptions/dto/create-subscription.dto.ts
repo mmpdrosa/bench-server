@@ -1,5 +1,5 @@
-import { IsNotEmpty, IsString, ValidateNested } from 'class-validator';
 import { Type } from 'class-transformer';
+import { IsNotEmpty, IsString, ValidateNested } from 'class-validator';
 
 class Keys {
   @IsNotEmpty()
