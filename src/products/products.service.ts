@@ -264,6 +264,54 @@ export class ProductsService {
     }, []);
   }
 
+  async findProductWithMinPrice(product_id: string) {
+    const {
+      product: {
+        id,
+        title,
+        reference_price,
+        image_url,
+        specs,
+        review_url,
+        productCategory,
+        productSubcategory,
+      },
+      ...data
+    } = await this.prisma.productRetailer.findFirstOrThrow({
+      where: { product: { id: product_id } },
+      orderBy: { price: 'asc' },
+      select: {
+        price: true,
+        store: true,
+        available: true,
+        html_url: true,
+        dummy: true,
+        created_at: true,
+        updated_at: true,
+        product: {
+          include: {
+            productCategory: { include: { category: true } },
+            productSubcategory: { include: { subcategory: true } },
+          },
+        },
+        retailer: true,
+        coupon: true,
+      },
+    });
+
+    return {
+      id,
+      title,
+      reference_price,
+      specs,
+      review_url,
+      image_url,
+      ...data,
+      category: productCategory ? productCategory.category : null,
+      subcategory: productSubcategory ? productSubcategory.subcategory : null,
+    };
+  }
+
   removeProductRetailerRelation(product_id: string, retailer_id: string) {
     return this.prisma.productRetailer.delete({
       where: {

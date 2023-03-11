@@ -23,6 +23,13 @@ export class CreateProductDto {
   reference_price?: number;
 
   @IsOptional()
+  specs?: string;
+
+  @IsOptional()
+  @IsString()
+  review_url?: string;
+
+  @IsOptional()
   @IsString()
   category_id?: string;
 

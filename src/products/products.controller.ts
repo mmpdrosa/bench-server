@@ -92,6 +92,13 @@ export class ProductsController {
     );
   }
 
+  @Get(':product_id/with-min-price')
+  findProductWithMinPrice(
+    @Param('product_id', ParseUUIDPipe) product_id: string,
+  ) {
+    return this.productsService.findProductWithMinPrice(product_id);
+  }
+
   @Delete(':product_id/retailers/:retailer_id')
   removeProductRetailerRelation(
     @Param('product_id', ParseUUIDPipe) product_id: string,

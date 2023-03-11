@@ -2,7 +2,8 @@
 // learn more about it in the docs: https://pris.ly/d/prisma-schema
 
 generator client {
-  provider = "prisma-client-js"
+  provider        = "prisma-client-js"
+  previewFeatures = ["fullTextSearch"]
 }
 
 datasource db {
@@ -22,10 +23,12 @@ model Retailer {
 }
 
 model Product {
-  id              String @id @default(uuid())
+  id              String  @id @default(uuid())
   title           String
   reference_price Int?
   image_url       String
+  specs           Json?
+  review_url      String?
 
   productCategory          ProductCategory?
   productSubcategory       ProductSubcategory?
