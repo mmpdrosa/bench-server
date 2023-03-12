@@ -36,7 +36,7 @@ export class SubscriptionsController {
     return this.subscriptionsService.removeByUserId(id);
   }
 
-  @Get()
+  @Get('public-key')
   publicKey() {
     return this.subscriptionsService.publicKey();
   }

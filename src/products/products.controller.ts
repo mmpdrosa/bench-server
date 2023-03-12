@@ -99,6 +99,13 @@ export class ProductsController {
     return this.productsService.findProductWithMinPrice(product_id);
   }
 
+  @Get(':product_id/price-history')
+  findProductPriceHistory(
+    @Param('product_id', ParseUUIDPipe) product_id: string,
+  ) {
+    return this.productsService.findProductPriceHistory(product_id);
+  }
+
   @Delete(':product_id/retailers/:retailer_id')
   removeProductRetailerRelation(
     @Param('product_id', ParseUUIDPipe) product_id: string,
