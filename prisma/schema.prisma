@@ -34,7 +34,7 @@ model Product {
   productSubcategory       ProductSubcategory?
   productRetailers         ProductRetailer[]
   usersProductNotification UserProductNotification[]
-  priceHistory             PriceHistory[]
+  productPriceHistory      ProductPriceHistory[]
 
   @@map("products")
 }
@@ -124,15 +124,18 @@ model ProductSubcategory {
   @@map("products_subcategories")
 }
 
-model PriceHistory {
-  id         String   @id @default(uuid())
-  price      Int
-  date       DateTime
-  product_id String
+model ProductPriceHistory {
+  id                String   @id @default(uuid())
+  was_available     Boolean
+  last_availability Boolean
+  lowest_price      Int
+  last_price        Int
+  date              DateTime
+  product_id        String
 
   product Product @relation(fields: [product_id], references: [id], onDelete: Cascade)
 
-  @@map("prices_history")
+  @@map("products_price_history")
 }
 
 model Subscription {

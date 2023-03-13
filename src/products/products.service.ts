@@ -18,10 +18,14 @@ export class ProductsService {
     return { ...data, category, subcategory };
   }
 
-  private async updateProductDailyPrice(product_id: string, price: number) {
+  private async updateProductDailyPrice(
+    product_id: string,
+    available: boolean,
+    price: number,
+  ) {
     const today = dayjs().startOf('day');
 
-    const register = await this.prisma.priceHistory.findFirst({
+    const register = await this.prisma.productPriceHistory.findFirst({
       where: {
         product_id,
         date: { gte: today.toDate(), lt: today.add(1, 'day').toDate() },
@@ -30,17 +34,24 @@ export class ProductsService {
     });
 
     if (register) {
-      if (register.price > price) {
-        await this.prisma.priceHistory.update({
-          where: { id: register.id },
-          data: { price },
-        });
-      }
+      await this.prisma.productPriceHistory.update({
+        where: { id: register.id },
+        data: {
+          last_availability: available,
+          was_available: register.was_available ? true : available,
+          lowest_price:
+            register.lowest_price > price ? price : register.lowest_price,
+          last_price: price,
+        },
+      });
     } else {
-      await this.prisma.priceHistory.create({
+      await this.prisma.productPriceHistory.create({
         data: {
           product_id,
-          price,
+          was_available: available,
+          last_availability: available,
+          lowest_price: price,
+          last_price: price,
           date: today.toDate(),
         },
       });
@@ -157,11 +168,17 @@ export class ProductsService {
     retailer_id: string,
     assignRetailerDto: AssignRetailerDto,
   ) {
-    await this.updateProductDailyPrice(product_id, assignRetailerDto.price);
-
-    return this.prisma.productRetailer.create({
+    const product = await this.prisma.productRetailer.create({
       data: { product_id, retailer_id, ...assignRetailerDto },
     });
+
+    await this.updateProductDailyPrice(
+      product_id,
+      product.available,
+      product.price,
+    );
+
+    return product;
   }
 
   findAllRetailers(product_id: string) {
@@ -196,11 +213,7 @@ export class ProductsService {
       }
     }
 
-    if (data.price) {
-      await this.updateProductDailyPrice(product_id, data.price);
-    }
-
-    return this.prisma.productRetailer.update({
+    const product = await this.prisma.productRetailer.update({
       where: {
         product_id_retailer_id: {
           product_id,
@@ -212,6 +225,14 @@ export class ProductsService {
         coupon_id,
       },
     });
+
+    await this.updateProductDailyPrice(
+      product_id,
+      product.available,
+      product.price,
+    );
+
+    return product;
   }
 
   async findProductsWithMinPrice(
@@ -349,7 +370,7 @@ export class ProductsService {
   }
 
   findProductPriceHistory(product_id: string) {
-    return this.prisma.priceHistory.findMany({ where: { product_id } });
+    return this.prisma.productPriceHistory.findMany({ where: { product_id } });
   }
 
   removeProductRetailerRelation(product_id: string, retailer_id: string) {
