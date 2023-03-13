@@ -1,11 +1,15 @@
 import { Injectable, NotAcceptableException } from '@nestjs/common';
 import dayjs from 'dayjs';
+import timezone from 'dayjs/plugin/timezone';
+import utc from 'dayjs/plugin/utc';
 import { PrismaService } from 'nestjs-prisma';
-
 import { AssignRetailerDto } from './dto/assign-retailer.dto';
 import { CreateProductDto } from './dto/create-product.dto';
 import { UpdateProductRetailerDto } from './dto/update-product-retailer.dto';
 import { UpdateProductDto } from './dto/update-product.dto';
+
+dayjs.extend(utc);
+dayjs.extend(timezone);
 
 @Injectable()
 export class ProductsService {
@@ -23,7 +27,7 @@ export class ProductsService {
     available: boolean,
     price: number,
   ) {
-    const today = dayjs().startOf('day');
+    const today = dayjs().tz('America/Sao_Paulo').startOf('day');
 
     const register = await this.prisma.productPriceHistory.findFirst({
       where: {
