@@ -3,6 +3,8 @@ import dayjs from 'dayjs';
 import timezone from 'dayjs/plugin/timezone';
 import utc from 'dayjs/plugin/utc';
 import { PrismaService } from 'nestjs-prisma';
+import webpush from 'web-push';
+
 import { AssignRetailerDto } from './dto/assign-retailer.dto';
 import { CreateProductDto } from './dto/create-product.dto';
 import { UpdateProductRetailerDto } from './dto/update-product-retailer.dto';
@@ -60,6 +62,51 @@ export class ProductsService {
         },
       });
     }
+  }
+
+  private async sendProductNotification(
+    product_id: string,
+    productTitle: string,
+    price: number,
+  ) {
+    const usersProductNotification =
+      await this.prisma.userProductNotification.findMany({
+        where: { product_id },
+      });
+
+    const notificationPromises = usersProductNotification.map(
+      async ({ user_id, price: userPrice }) => {
+        if (userPrice <= price) return;
+
+        const userSubscriptions = await this.prisma.subscription.findMany({
+          where: { user_id },
+        });
+
+        return Promise.allSettled(
+          userSubscriptions.map(({ endpoint, keys }) => {
+            const pushSubscription = {
+              endpoint,
+              keys: JSON.parse(keys as string),
+            };
+
+            const notificationPayload = {
+              title: 'Aviso de preço!',
+              body: `O produto ${productTitle} agora está abaixo do preço que você queria!`,
+              data: {
+                url: 'https://bench-shop.vercel.app/',
+              },
+            };
+
+            return webpush.sendNotification(
+              pushSubscription,
+              JSON.stringify(notificationPayload),
+            );
+          }),
+        );
+      },
+    );
+
+    await Promise.allSettled(notificationPromises);
   }
 
   async create({ category_id, subcategory_id, ...data }: CreateProductDto) {
@@ -217,7 +264,7 @@ export class ProductsService {
       }
     }
 
-    const product = await this.prisma.productRetailer.update({
+    const productRetailer = await this.prisma.productRetailer.update({
       where: {
         product_id_retailer_id: {
           product_id,
@@ -228,15 +275,30 @@ export class ProductsService {
         ...data,
         coupon_id,
       },
+      include: {
+        product: { select: { title: true } },
+      },
     });
+
+    if ((productRetailer.available && data.price) || data.available) {
+      try {
+        await this.sendProductNotification(
+          product_id,
+          productRetailer.product.title,
+          productRetailer.price,
+        );
+      } catch (err) {
+        console.error(err);
+      }
+    }
 
     await this.updateProductDailyPrice(
       product_id,
-      product.available,
-      product.price,
+      productRetailer.available,
+      productRetailer.price,
     );
 
-    return product;
+    return productRetailer;
   }
 
   async findProductsWithMinPrice(

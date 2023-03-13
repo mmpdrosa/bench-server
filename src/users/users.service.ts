@@ -1,11 +1,19 @@
-import { ConflictException, Injectable } from '@nestjs/common';
+import {
+  ConflictException,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 import { UserRecord } from 'firebase-admin/auth';
+import { PrismaService } from 'nestjs-prisma';
 
 import { auth } from 'src/config/firebase';
+import { CreateProductNotificationDto } from './dto/create-product-notification.dto';
 import { CreateUserDto } from './dto/create-user.dto';
 
 @Injectable()
 export class UsersService {
+  constructor(private prisma: PrismaService) {}
+
   private mapUser(user: UserRecord) {
     const { uid, displayName, email, customClaims } = user;
     return { uid, username: displayName, email, role: customClaims };
@@ -59,6 +67,50 @@ export class UsersService {
       return auth.deleteUser(id);
     } catch (err) {
       throw err;
+    }
+  }
+
+  async notifyProduct(
+    user_id: string,
+    product_id: string,
+    { price }: CreateProductNotificationDto,
+  ) {
+    const notification = await this.prisma.userProductNotification.findFirst({
+      where: { user_id, product_id },
+    });
+
+    return notification
+      ? await this.prisma.userProductNotification.update({
+          where: { id: notification.id },
+          data: { price },
+        })
+      : await this.prisma.userProductNotification.create({
+          data: { user_id, product_id, price },
+        });
+  }
+
+  async findAllUserProductNotifications(user_id: string) {
+    return this.prisma.userProductNotification.findMany({
+      where: { user_id },
+      select: {
+        id: true,
+        price: true,
+        product: { select: { id: true, image_url: true, title: true } },
+      },
+    });
+  }
+
+  async unnotifyProduct(user_id: string, product_id: string) {
+    const notification = await this.prisma.userProductNotification.findFirst({
+      where: { user_id, product_id },
+    });
+
+    if (notification) {
+      return this.prisma.userProductNotification.delete({
+        where: { id: notification.id },
+      });
+    } else {
+      throw new NotFoundException('Notification not found');
     }
   }
 }

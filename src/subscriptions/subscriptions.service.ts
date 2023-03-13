@@ -2,11 +2,14 @@ import { Injectable } from '@nestjs/common';
 import { PrismaService } from 'nestjs-prisma';
 
 import { CreateSubscriptionDto } from './dto/create-subscription.dto';
-import { ToogleProductNotificationDto } from './dto/toogle-product-notification.dto';
 
 @Injectable()
 export class SubscriptionsService {
   constructor(private prisma: PrismaService) {}
+
+  async publicKey() {
+    return process.env.PUBLIC_VAPID_KEY;
+  }
 
   async create(user_id: string, createSubscriptionDto: CreateSubscriptionDto) {
     const { endpoint, keys } = createSubscriptionDto;
@@ -38,35 +41,5 @@ export class SubscriptionsService {
 
   async removeByUserId(id: string) {
     return this.prisma.subscription.deleteMany({ where: { user_id: id } });
-  }
-
-  async publicKey() {
-    return process.env.PUBLIC_VAPID_KEY;
-  }
-
-  async toogleProduct(
-    user_id: string,
-    product_id: string,
-    toogleProductNotificationDto: ToogleProductNotificationDto,
-  ) {
-    const { price } = toogleProductNotificationDto;
-
-    await this.prisma.subscription.findFirstOrThrow({
-      where: { user_id },
-    });
-
-    const notification = await this.prisma.userProductNotification.findFirst({
-      where: { user_id, product_id },
-    });
-
-    if (notification) {
-      return await this.prisma.userProductNotification.delete({
-        where: { id: notification.id },
-      });
-    } else {
-      return await this.prisma.userProductNotification.create({
-        data: { user_id, price, product: { connect: { id: product_id } } },
-      });
-    }
   }
 }

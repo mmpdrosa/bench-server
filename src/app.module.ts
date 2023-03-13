@@ -53,7 +53,9 @@ export class AppModule implements NestModule {
       .forRoutes(
         { path: 'subscriptions', method: RequestMethod.POST },
         { path: 'subscriptions', method: RequestMethod.DELETE },
-        'subscriptions/(*)',
+        'users/notify-product',
+        'users/product-notifications',
+        'users/unnotify-product',
       );
   }
 }
