@@ -38,7 +38,6 @@ export class RetailersService {
       },
       select: {
         price: true,
-        store: true,
         available: true,
         html_url: true,
         dummy: true,

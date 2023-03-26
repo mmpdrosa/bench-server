@@ -15,6 +15,7 @@ CREATE TABLE "products" (
     "image_url" TEXT NOT NULL,
     "specs" JSONB,
     "review_url" TEXT,
+    "recommended" BOOLEAN,
 
     CONSTRAINT "products_pkey" PRIMARY KEY ("id")
 );
@@ -26,7 +27,7 @@ CREATE TABLE "coupons" (
     "code" TEXT NOT NULL,
     "discount" TEXT NOT NULL,
     "minimum_spend" INTEGER,
-    "store" TEXT,
+    "comments" TEXT,
     "description" TEXT,
     "retailer_id" TEXT NOT NULL,
 
@@ -37,7 +38,6 @@ CREATE TABLE "coupons" (
 CREATE TABLE "products_retailers" (
     "id" TEXT NOT NULL,
     "price" INTEGER NOT NULL,
-    "store" TEXT,
     "available" BOOLEAN NOT NULL,
     "html_url" TEXT NOT NULL,
     "dummy" TEXT,
@@ -198,7 +198,7 @@ ALTER TABLE "products_subcategories" ADD CONSTRAINT "products_subcategories_subc
 ALTER TABLE "products_price_history" ADD CONSTRAINT "products_price_history_product_id_fkey" FOREIGN KEY ("product_id") REFERENCES "products"("id") ON DELETE CASCADE ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE "sales" ADD CONSTRAINT "sales_category_id_fkey" FOREIGN KEY ("category_id") REFERENCES "categories"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+ALTER TABLE "sales" ADD CONSTRAINT "sales_category_id_fkey" FOREIGN KEY ("category_id") REFERENCES "categories"("id") ON DELETE CASCADE ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE "users_products_notifications" ADD CONSTRAINT "users_products_notifications_product_id_fkey" FOREIGN KEY ("product_id") REFERENCES "products"("id") ON DELETE CASCADE ON UPDATE CASCADE;

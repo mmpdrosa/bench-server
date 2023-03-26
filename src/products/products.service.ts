@@ -9,6 +9,7 @@ import utc from 'dayjs/plugin/utc';
 import { PrismaService } from 'nestjs-prisma';
 import webpush from 'web-push';
 
+import { priceFormatter } from '../utils/formatter';
 import { AssignRetailerDto } from './dto/assign-retailer.dto';
 import { CreateProductDto } from './dto/create-product.dto';
 import { UpdateProductRetailerDto } from './dto/update-product-retailer.dto';
@@ -97,9 +98,11 @@ export class ProductsService {
 
             const notificationPayload = {
               title: 'Aviso de preço!',
-              body: `O produto ${productTitle} agora está abaixo do preço que você queria!`,
+              body: `Aproveite o desconto em ${productTitle} por apenas ${priceFormatter.format(
+                price / 100,
+              )}. Compre agora e economize!`,
               data: {
-                url: 'https://bench-shop.vercel.app/',
+                url: `${process.env.WEB_URL}/products/${product_id}`,
               },
             };
 
@@ -243,7 +246,6 @@ export class ProductsService {
       where: { product_id },
       select: {
         price: true,
-        store: true,
         available: true,
         html_url: true,
         dummy: true,
@@ -339,7 +341,6 @@ export class ProductsService {
       where,
       select: {
         price: true,
-        store: true,
         available: true,
         html_url: true,
         dummy: true,
@@ -411,7 +412,6 @@ export class ProductsService {
       orderBy: { price: 'asc' },
       select: {
         price: true,
-        store: true,
         available: true,
         html_url: true,
         dummy: true,

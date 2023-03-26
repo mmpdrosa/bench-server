@@ -23,12 +23,13 @@ model Retailer {
 }
 
 model Product {
-  id              String  @id @default(uuid())
+  id              String   @id @default(uuid())
   title           String
   reference_price Int?
   image_url       String
   specs           Json?
   review_url      String?
+  recommended     Boolean?
 
   productCategory          ProductCategory?
   productSubcategory       ProductSubcategory?
@@ -45,7 +46,7 @@ model Coupon {
   code          String
   discount      String
   minimum_spend Int?
-  store         String?
+  comments      String?
   description   String?
   retailer_id   String
 
@@ -60,7 +61,6 @@ model Coupon {
 model ProductRetailer {
   id          String   @id @default(uuid())
   price       Int
-  store       String?
   available   Boolean
   html_url    String
   dummy       String?
@@ -85,7 +85,7 @@ model Category {
   subcategories             Subcategory[]
   productsCategory          ProductCategory[]
   usersCategoryNotification UserCategoryNotification[]
-  Sale                      Sale[]
+  sales                     Sale[]
 
   @@map("categories")
 }
@@ -151,7 +151,7 @@ model Sale {
   category_id String
   coupon      String?
 
-  category Category @relation(fields: [category_id], references: [id])
+  category Category @relation(fields: [category_id], references: [id], onDelete: Cascade)
 
   @@map("sales")
 }

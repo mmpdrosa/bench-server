@@ -20,8 +20,8 @@ export class CouponsService {
         code: true,
         discount: true,
         minimum_spend: true,
+        comments: true,
         description: true,
-        store: true,
         retailer: true,
       },
     });
@@ -36,8 +36,8 @@ export class CouponsService {
         code: true,
         discount: true,
         minimum_spend: true,
+        comments: true,
         description: true,
-        store: true,
         retailer: true,
       },
     });
