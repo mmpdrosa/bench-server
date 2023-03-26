@@ -28,8 +28,8 @@ jobs:
           host: ${{ secrets.SSH_HOST }}
           username: ${{ secrets.SSH_USER }}
           key: ${{ secrets.SSH_KEY }}
-          source: "dist/ .env package*.json docker-compose.yml"
-          target: "~/bench-server/"
+          source: "."
+          target: "bench-server"
 
       - name: Connect to server and start app
         uses: appleboy/ssh-action@master
@@ -38,7 +38,7 @@ jobs:
           username: ${{ secrets.SSH_USER }}
           key: ${{ secrets.SSH_KEY }}
           script: |
-            cd ~/bench-server/
+            cd bench-server
             docker-compose down
             docker-compose pull
             docker-compose up -d
