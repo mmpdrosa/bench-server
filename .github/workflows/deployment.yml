@@ -31,6 +31,8 @@ jobs:
           script: |
             cd ~/bench-server
             git pull
+            export NVM_DIR=~/.nvm
+            source ~/.nvm/nvm.sh  
             npm i
             docker compose up -d
             npx prisma migrate deploy
