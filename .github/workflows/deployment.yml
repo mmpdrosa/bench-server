@@ -28,8 +28,8 @@ jobs:
           host: ${{ secrets.SSH_HOST }}
           username: ${{ secrets.SSH_USER }}
           key: ${{ secrets.SSH_KEY }}
-          source: "."
-          target: "/bench-server"
+          source: "., !node_modules"
+          target: "cd ~/bench-server"
 
       - name: Connect to server and start app
         uses: appleboy/ssh-action@master
@@ -38,11 +38,8 @@ jobs:
           username: ${{ secrets.SSH_USER }}
           key: ${{ secrets.SSH_KEY }}
           script: |
-            cd bench-server
-            docker-compose down
-            docker-compose pull
-            docker-compose up -d
-
-      - name: Run Prisma Migrations
-        run: npx prisma migrate deploy
+            cd ~/bench-server
+            npm i
+            docker compose up -d
+            npx prisma migrate deploy
 
