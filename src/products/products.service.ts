@@ -1,4 +1,8 @@
-import { Injectable, NotAcceptableException } from '@nestjs/common';
+import {
+  Injectable,
+  InternalServerErrorException,
+  NotAcceptableException,
+} from '@nestjs/common';
 import dayjs from 'dayjs';
 import timezone from 'dayjs/plugin/timezone';
 import utc from 'dayjs/plugin/utc';
@@ -12,6 +16,8 @@ import { UpdateProductDto } from './dto/update-product.dto';
 
 dayjs.extend(utc);
 dayjs.extend(timezone);
+
+dayjs.tz.setDefault('America/Sao_Paulo');
 
 @Injectable()
 export class ProductsService {
@@ -29,7 +35,6 @@ export class ProductsService {
     available: boolean,
     price: number,
   ) {
-    // const today = dayjs().tz('America/Sao_Paulo').startOf('day');
     const today = dayjs().startOf('day');
 
     const register = await this.prisma.productPriceHistory.findFirst({
@@ -289,7 +294,7 @@ export class ProductsService {
           productRetailer.price,
         );
       } catch (err) {
-        console.error(err);
+        throw new InternalServerErrorException(err);
       }
     }
 

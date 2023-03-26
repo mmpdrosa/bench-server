@@ -6,13 +6,16 @@ import {
 import { UserRecord } from 'firebase-admin/auth';
 import { PrismaService } from 'nestjs-prisma';
 
-import { auth } from 'src/config/firebase';
+import { FirebaseService } from '../firebase/firebase.service';
 import { CreateProductNotificationDto } from './dto/create-product-notification.dto';
 import { CreateUserDto } from './dto/create-user.dto';
 
 @Injectable()
 export class UsersService {
-  constructor(private prisma: PrismaService) {}
+  constructor(
+    private readonly prisma: PrismaService,
+    private readonly firebase: FirebaseService,
+  ) {}
 
   private mapUser(user: UserRecord) {
     const { uid, displayName, email, customClaims } = user;
@@ -21,18 +24,18 @@ export class UsersService {
 
   async create({ email, password, photo_url, username }: CreateUserDto) {
     try {
-      const user = await auth.getUserByEmail(email);
+      const user = await this.firebase.auth.getUserByEmail(email);
 
       if (user) {
         throw new ConflictException('This email address is already in use');
       }
     } catch (err) {
       if (err.code !== 'auth/user-not-found') {
-        throw err;
+        throw new NotFoundException(err);
       }
     }
 
-    const user = await auth.createUser({
+    const user = await this.firebase.auth.createUser({
       displayName: username,
       email,
       password,
@@ -43,30 +46,26 @@ export class UsersService {
   }
 
   async findAll() {
-    try {
-      const { users } = await auth.listUsers();
+    const { users } = await this.firebase.auth.listUsers();
 
-      return users.map((user) => this.mapUser(user));
-    } catch (err) {
-      throw err;
-    }
+    return users.map((user) => this.mapUser(user));
   }
 
   async findOne(id: string) {
     try {
-      const user = await auth.getUser(id);
+      const user = await this.firebase.auth.getUser(id);
 
       return this.mapUser(user);
     } catch (err) {
-      throw err;
+      throw new NotFoundException(err);
     }
   }
 
-  remove(id: string) {
+  async remove(id: string) {
     try {
-      return auth.deleteUser(id);
+      await this.firebase.auth.deleteUser(id);
     } catch (err) {
-      throw err;
+      throw new NotFoundException(err);
     }
   }
 
@@ -110,7 +109,7 @@ export class UsersService {
         where: { id: notification.id },
       });
     } else {
-      throw new NotFoundException('Notification not found');
+      throw new NotFoundException();
     }
   }
 }

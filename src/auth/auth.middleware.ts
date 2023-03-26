@@ -5,10 +5,12 @@ import {
 } from '@nestjs/common';
 import { NextFunction } from 'express';
 
-import { auth } from 'src/config/firebase';
+import { FirebaseService } from '../firebase/firebase.service';
 
 @Injectable()
 export class AuthMiddleware implements NestMiddleware {
+  constructor(private readonly firebase: FirebaseService) {}
+
   async use(req: Request, res: Response, next: NextFunction) {
     const authorization = req.headers['authorization'];
 
@@ -19,7 +21,7 @@ export class AuthMiddleware implements NestMiddleware {
     }
 
     try {
-      const decodedToken = await auth.verifyIdToken(token);
+      const decodedToken = await this.firebase.auth.verifyIdToken(token);
 
       req['user'] = {
         id: decodedToken.uid,

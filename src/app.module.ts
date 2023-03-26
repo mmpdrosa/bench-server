@@ -13,8 +13,10 @@ import { AppController } from './app.controller';
 import { AuthMiddleware } from './auth/auth.middleware';
 import { CategoriesModule } from './categories/categories.module';
 import { CouponsModule } from './coupons/coupons.module';
+import { FirebaseModule } from './firebase/firebase.module';
 import { ProductsModule } from './products/products.module';
 import { RetailersModule } from './retailers/retailers.module';
+import { SalesModule } from './sales/sales.module';
 import { SubcategoriesModule } from './subcategories/subcategories.module';
 import { SubscriptionsModule } from './subscriptions/subscriptions.module';
 import { UsersModule } from './users/users.module';
@@ -29,6 +31,8 @@ import { UsersModule } from './users/users.module';
     SubcategoriesModule,
     CouponsModule,
     RetailersModule,
+    SalesModule,
+    FirebaseModule,
   ],
   controllers: [AppController],
   providers: [

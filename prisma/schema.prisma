@@ -85,6 +85,7 @@ model Category {
   subcategories             Subcategory[]
   productsCategory          ProductCategory[]
   usersCategoryNotification UserCategoryNotification[]
+  Sale                      Sale[]
 
   @@map("categories")
 }
@@ -136,6 +137,23 @@ model ProductPriceHistory {
   product Product @relation(fields: [product_id], references: [id], onDelete: Cascade)
 
   @@map("products_price_history")
+}
+
+model Sale {
+  id          String   @id @default(uuid())
+  title       String
+  image_url   String
+  html_url    String
+  price       Int
+  specs       String?
+  created_at  DateTime @default(now())
+  comments    String?
+  category_id String
+  coupon      String?
+
+  category Category @relation(fields: [category_id], references: [id])
+
+  @@map("sales")
 }
 
 model Subscription {
