@@ -9,6 +9,8 @@ services:
       - 3333:3333
     depends_on:
       - postgres
+    environment:
+      - DB_HOST=postgres
     env_file:
       - .env
 
