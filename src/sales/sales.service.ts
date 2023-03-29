@@ -75,7 +75,7 @@ export class SalesService {
   findAll() {
     return this.prisma.sale.findMany({
       include: { category: true },
-      orderBy: { created_at: 'asc' },
+      orderBy: { created_at: 'desc' },
     });
   }
 

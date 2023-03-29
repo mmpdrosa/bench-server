@@ -68,4 +68,21 @@ export class UsersController {
 
     return this.usersService.unnotifyProduct(user_id, product_id);
   }
+
+  @Post('toggle-category-notification/:category_id')
+  toggleCategoryNotification(
+    @Req() req,
+    @Param('category_id', ParseUUIDPipe) category_id: string,
+  ) {
+    const { id: user_id } = req['user'];
+
+    return this.usersService.toggleCategoryNotification(user_id, category_id);
+  }
+
+  @Get('category-notifications/for-all')
+  findAllUserCategoryNotifications(@Req() req) {
+    const { id: user_id } = req['user'];
+
+    return this.usersService.findAllUserCategoryNotifications(user_id);
+  }
 }

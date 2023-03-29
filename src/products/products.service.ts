@@ -316,6 +316,13 @@ export class ProductsService {
   ) {
     const where = { product: {} };
 
+    if (search === 'recommended') {
+      where.product = {
+        ...where.product,
+        recommended: true,
+      };
+    }
+
     if (search !== 'all') {
       where.product = {
         ...where.product,

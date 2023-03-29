@@ -89,14 +89,37 @@ export class UsersService {
   }
 
   async findAllUserProductNotifications(user_id: string) {
-    return this.prisma.userProductNotification.findMany({
-      where: { user_id },
-      select: {
-        id: true,
-        price: true,
-        product: { select: { id: true, image_url: true, title: true } },
+    const userProductNotifications =
+      await this.prisma.userProductNotification.findMany({
+        where: { user_id },
+        select: {
+          id: true,
+          price: true,
+          product: {
+            select: {
+              id: true,
+              image_url: true,
+              title: true,
+              productRetailers: {
+                orderBy: { price: 'asc' },
+                take: 1,
+                select: { price: true },
+              },
+            },
+          },
+        },
+      });
+
+    return userProductNotifications.map(({ id, price, product }) => ({
+      id,
+      price,
+      product: {
+        id: product.id,
+        title: product.title,
+        image_url: product.image_url,
+        price: product.productRetailers[0].price,
       },
-    });
+    }));
   }
 
   async unnotifyProduct(user_id: string, product_id: string) {
@@ -111,5 +134,29 @@ export class UsersService {
     } else {
       throw new NotFoundException();
     }
+  }
+
+  async toggleCategoryNotification(user_id: string, category_id: string) {
+    const notification = await this.prisma.userCategoryNotification.findFirst({
+      where: { user_id, category_id },
+    });
+
+    return notification
+      ? await this.prisma.userCategoryNotification.delete({
+          where: { id: notification.id },
+        })
+      : await this.prisma.userCategoryNotification.create({
+          data: { user_id, category_id },
+        });
+  }
+
+  async findAllUserCategoryNotifications(user_id: string) {
+    return this.prisma.userCategoryNotification.findMany({
+      where: { user_id },
+      select: {
+        id: true,
+        category: { select: { id: true, name: true } },
+      },
+    });
   }
 }

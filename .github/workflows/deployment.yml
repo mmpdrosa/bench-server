@@ -33,5 +33,6 @@ jobs:
             git pull
             source ~/.asdf/asdf.sh
             npm install
+            docker compose build
             docker compose up -d
             npx prisma migrate deploy

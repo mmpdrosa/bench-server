@@ -60,6 +60,8 @@ export class AppModule implements NestModule {
         'users/notify-product',
         'users/product-notifications',
         'users/unnotify-product',
+        'users/toggle-category-notification',
+        'users/category-notifications',
       );
   }
 }
