@@ -7,9 +7,7 @@ WORKDIR /usr/src/app
 COPY package*.json ./
 COPY prisma ./prisma/
 
-RUN npm install --only=production
-RUN npx prisma generate
-RUN npx prisma migrate deploy
+RUN npm install --omit=dev
 
 COPY . .
 
