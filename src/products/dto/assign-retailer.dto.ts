@@ -13,10 +13,6 @@ export class AssignRetailerDto {
   @IsPositive()
   price: number;
 
-  @IsOptional()
-  @IsString()
-  store?: string;
-
   @IsNotEmpty()
   @IsBoolean()
   available: boolean;

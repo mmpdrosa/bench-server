@@ -9,12 +9,12 @@ import {
 
 export class CreateCouponDto {
   @IsNotEmpty()
-  @IsBoolean()
-  available: boolean;
-
-  @IsNotEmpty()
   @IsString()
   code: string;
+
+  @IsNotEmpty()
+  @IsBoolean()
+  available: boolean;
 
   @IsNotEmpty()
   @IsString()
@@ -27,11 +27,11 @@ export class CreateCouponDto {
 
   @IsOptional()
   @IsString()
-  description?: string;
+  comments?: string;
 
   @IsOptional()
   @IsString()
-  store?: string;
+  description?: string;
 
   @IsNotEmpty()
   @IsString()

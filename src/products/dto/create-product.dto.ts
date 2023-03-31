@@ -1,4 +1,5 @@
 import {
+  IsBoolean,
   IsInt,
   IsNotEmpty,
   IsNumber,
@@ -21,6 +22,10 @@ export class CreateProductDto {
   @IsPositive()
   @IsInt()
   reference_price?: number;
+
+  @IsOptional()
+  @IsBoolean()
+  recommended?: boolean;
 
   @IsOptional()
   specs?: string;

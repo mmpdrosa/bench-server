@@ -72,8 +72,19 @@ export class SalesService {
     return sale;
   }
 
-  findAll() {
+  findAll(search: string) {
+    const where = { AND: [] };
+
+    if (search !== 'all') {
+      const words = search.trim().split(/\s+/).filter(Boolean);
+
+      where.AND = words.map((word) => ({
+        title: { contains: word, mode: 'insensitive' },
+      }));
+    }
+
     return this.prisma.sale.findMany({
+      where,
       include: { category: true },
       orderBy: { created_at: 'desc' },
     });

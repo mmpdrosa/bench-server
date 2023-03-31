@@ -7,6 +7,7 @@ import {
   ParseUUIDPipe,
   Patch,
   Post,
+  Query,
 } from '@nestjs/common';
 
 import { CreateSaleDto } from './dto/create-sale.dto';
@@ -23,8 +24,8 @@ export class SalesController {
   }
 
   @Get()
-  findAll() {
-    return this.salesService.findAll();
+  findAll(@Query('search') search = 'all') {
+    return this.salesService.findAll(search);
   }
 
   @Get(':id')

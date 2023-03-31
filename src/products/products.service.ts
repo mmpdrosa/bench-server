@@ -314,7 +314,7 @@ export class ProductsService {
     category_id: string,
     subcategory_id: string,
   ) {
-    const where = { product: {} };
+    const where = { product: {}, AND: [] };
 
     if (search === 'recommended') {
       where.product = {
@@ -324,10 +324,11 @@ export class ProductsService {
     }
 
     if (search !== 'all') {
-      where.product = {
-        ...where.product,
-        title: { contains: search, mode: 'insensitive' },
-      };
+      const words = search.trim().split(/\s+/).filter(Boolean);
+
+      where.AND = words.map((word) => ({
+        product: { title: { contains: word, mode: 'insensitive' } },
+      }));
     }
 
     if (category_id !== 'all') {
