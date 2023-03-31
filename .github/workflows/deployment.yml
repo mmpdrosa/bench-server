@@ -35,4 +35,3 @@ jobs:
             npm install
             docker compose build
             docker compose up -d
-            npx prisma migrate deploy

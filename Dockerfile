@@ -1,17 +1,21 @@
-FROM node:16 AS builder
+FROM node:16-alpine AS builder
+
+RUN npm i npm@latest -g
 
 WORKDIR /usr/src/app
 
 COPY package*.json ./
 COPY prisma ./prisma/
 
-RUN npm install
+RUN npm install --only=production
+RUN npx prisma generate
+RUN npx prisma migrate deploy
 
 COPY . .
 
 RUN npm run build
 
-FROM node:16
+FROM node:16-alpine
 
 WORKDIR /usr/src/app
 

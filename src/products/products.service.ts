@@ -323,7 +323,7 @@ export class ProductsService {
       };
     }
 
-    if (search !== 'all') {
+    if (search !== 'all' && search !== 'recommended') {
       const words = search.trim().split(/\s+/).filter(Boolean);
 
       where.AND = words.map((word) => ({
