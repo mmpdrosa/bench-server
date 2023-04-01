@@ -5,6 +5,7 @@ import {
   Get,
   Param,
   ParseUUIDPipe,
+  Patch,
   Post,
   Req,
 } from '@nestjs/common';
@@ -35,6 +36,11 @@ export class UsersController {
   @Delete(':id')
   remove(@Param('id') id: string) {
     return this.usersService.remove(id);
+  }
+
+  @Patch(':id/make-admin')
+  makeUserAdmin(@Param('id') id: string) {
+    return this.usersService.makeUserAdmin(id);
   }
 
   @Post('notify-product/:product_id')

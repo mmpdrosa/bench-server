@@ -19,7 +19,7 @@ export class UsersService {
 
   private mapUser(user: UserRecord) {
     const { uid, displayName, email, customClaims } = user;
-    return { uid, username: displayName, email, role: customClaims };
+    return { uid, username: displayName, email, ...customClaims };
   }
 
   async create({ email, password, photo_url, username }: CreateUserDto) {
@@ -158,5 +158,9 @@ export class UsersService {
         category: { select: { id: true, name: true } },
       },
     });
+  }
+
+  async makeUserAdmin(user_id: string) {
+    await this.firebase.auth.setCustomUserClaims(user_id, { role: 'admin' });
   }
 }

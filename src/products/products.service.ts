@@ -4,8 +4,6 @@ import {
   NotAcceptableException,
 } from '@nestjs/common';
 import dayjs from 'dayjs';
-import timezone from 'dayjs/plugin/timezone';
-import utc from 'dayjs/plugin/utc';
 import { PrismaService } from 'nestjs-prisma';
 import webpush from 'web-push';
 
@@ -14,11 +12,6 @@ import { AssignRetailerDto } from './dto/assign-retailer.dto';
 import { CreateProductDto } from './dto/create-product.dto';
 import { UpdateProductRetailerDto } from './dto/update-product-retailer.dto';
 import { UpdateProductDto } from './dto/update-product.dto';
-
-dayjs.extend(utc);
-dayjs.extend(timezone);
-
-dayjs.tz.setDefault('America/Sao_Paulo');
 
 @Injectable()
 export class ProductsService {
@@ -102,7 +95,7 @@ export class ProductsService {
                 price / 100,
               )}. Compre agora e economize!`,
               data: {
-                url: `${process.env.WEB_URL}/products/${product_id}`,
+                url: `/products/${product_id}`,
               },
             };
 

@@ -40,7 +40,7 @@ export class SalesService {
                 productPrice / 100,
               )}. Corra e compre já!`,
               data: {
-                url: `${process.env.WEB_URL}/sales`,
+                url: `/sales`,
               },
             };
 

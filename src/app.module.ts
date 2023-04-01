@@ -8,6 +8,9 @@ import {
 import { ConfigModule } from '@nestjs/config';
 import { APP_FILTER, HttpAdapterHost } from '@nestjs/core';
 import { PrismaClientExceptionFilter } from 'nestjs-prisma';
+import dayjs from 'dayjs';
+import timezone from 'dayjs/plugin/timezone';
+import utc from 'dayjs/plugin/utc';
 
 import { AppController } from './app.controller';
 import { AuthMiddleware } from './auth/auth.middleware';
@@ -20,6 +23,10 @@ import { SalesModule } from './sales/sales.module';
 import { SubcategoriesModule } from './subcategories/subcategories.module';
 import { SubscriptionsModule } from './subscriptions/subscriptions.module';
 import { UsersModule } from './users/users.module';
+
+dayjs.extend(utc);
+dayjs.extend(timezone);
+dayjs.tz.setDefault('America/Sao_Paulo');
 
 @Module({
   imports: [
