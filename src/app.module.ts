@@ -69,6 +69,7 @@ export class AppModule implements NestModule {
         'users/unnotify-product',
         'users/toggle-category-notification',
         'users/category-notifications',
+        'users/role/admin',
       );
   }
 }

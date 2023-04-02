@@ -43,6 +43,13 @@ export class UsersController {
     return this.usersService.makeUserAdmin(id);
   }
 
+  @Get('role/admin')
+  verifyUserAdmin(@Req() req) {
+    const { role } = req['user'];
+
+    return role === 'admin';
+  }
+
   @Post('notify-product/:product_id')
   notifyProduct(
     @Req() req,
