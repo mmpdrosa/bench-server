@@ -26,7 +26,7 @@ export class CreateSaleDto {
   @IsInt()
   price: number;
 
-  @IsNotEmpty()
+  @IsOptional()
   @IsString()
   specs?: string;
 
