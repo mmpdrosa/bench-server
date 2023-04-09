@@ -84,8 +84,6 @@ export class SalesService {
       }));
     }
 
-    const totalCount = await this.prisma.sale.count({ where });
-
     const sales = await this.prisma.sale.findMany({
       where,
       include: {
@@ -116,10 +114,7 @@ export class SalesService {
       reactions: reactionsMap.get(sale.id) || null,
     }));
 
-    return {
-      totalCount,
-      sales: salesWithReactions,
-    };
+    return salesWithReactions;
   }
 
   findOne(id: string) {
