@@ -23,26 +23,27 @@ model Retailer {
 }
 
 model Product {
-  id              String   @id @default(uuid())
+  id              String  @id @default(uuid())
   title           String
   reference_price Int?
   image_url       String
   specs           Json?
   review_url      String?
-  recommended     Boolean?
+  recommended     Boolean @default(false)
 
   productCategory          ProductCategory?
   productSubcategory       ProductSubcategory?
   productRetailers         ProductRetailer[]
   usersProductNotification UserProductNotification[]
   productPriceHistory      ProductPriceHistory[]
+  sales                    Sale[]
 
   @@map("products")
 }
 
 model Coupon {
   id            String  @id @default(uuid())
-  available     Boolean
+  available     Boolean @default(true)
   code          String
   discount      String
   minimum_spend Int?
@@ -61,7 +62,7 @@ model Coupon {
 model ProductRetailer {
   id          String   @id @default(uuid())
   price       Int
-  available   Boolean
+  available   Boolean  @default(true)
   html_url    String
   dummy       String?
   created_at  DateTime @default(now())
@@ -150,11 +151,37 @@ model Sale {
   comments    String?
   category_id String
   coupon      String?
+  product_id  String?
 
   category Category @relation(fields: [category_id], references: [id], onDelete: Cascade)
+  product  Product? @relation(fields: [product_id], references: [id], onDelete: SetNull)
+
+  reactions SaleReaction[]
 
   @@map("sales")
 }
+
+model SaleReaction {
+  id         String   @id @default(uuid())
+  user_id    String
+  created_at DateTime @default(now())
+  content    String
+  sale_id    String
+
+  sale Sale @relation(fields: [sale_id], references: [id], onDelete: Cascade)
+
+  @@unique([user_id, sale_id, content])
+  @@map("sales_reactions")
+}
+
+// like
+// dislike
+// clown
+// shit
+// heart
+// fire
+// thinking
+// rofl
 
 model Subscription {
   id       String @id @default(uuid())

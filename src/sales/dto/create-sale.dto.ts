@@ -41,4 +41,8 @@ export class CreateSaleDto {
   @IsOptional()
   @IsString()
   coupon?: string;
+
+  @IsOptional()
+  @IsString()
+  product_id?: string;
 }

@@ -163,4 +163,11 @@ export class UsersService {
   async makeUserAdmin(user_id: string) {
     await this.firebase.auth.setCustomUserClaims(user_id, { role: 'admin' });
   }
+
+  findAllUserSalesReactions(user_id: string) {
+    return this.prisma.saleReaction.findMany({
+      where: { user_id },
+      select: { sale_id: true, content: true },
+    });
+  }
 }

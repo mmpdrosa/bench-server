@@ -5,6 +5,7 @@ import webpush from 'web-push';
 import { priceFormatter } from '../utils/formatter';
 import { CreateSaleDto } from './dto/create-sale.dto';
 import { UpdateSaleDto } from './dto/update-sale.dto';
+import { CreateSaleReactionDto } from './dto/create-sale-reaction.dto';
 
 @Injectable()
 export class SalesService {
@@ -72,7 +73,7 @@ export class SalesService {
     return sale;
   }
 
-  findAll(search: string) {
+  async findAll(search: string, skip: number, take: number) {
     const where = { AND: [] };
 
     if (search !== 'all') {
@@ -83,11 +84,42 @@ export class SalesService {
       }));
     }
 
-    return this.prisma.sale.findMany({
+    const totalCount = await this.prisma.sale.count({ where });
+
+    const sales = await this.prisma.sale.findMany({
       where,
-      include: { category: true },
+      include: {
+        category: true,
+      },
       orderBy: { created_at: 'desc' },
+      skip,
+      take,
     });
+
+    const reactions = await this.prisma.saleReaction.groupBy({
+      by: ['sale_id', 'content'],
+      _count: { content: true },
+    });
+
+    const reactionsMap = new Map();
+
+    reactions.forEach(({ sale_id, content, _count }) => {
+      if (reactionsMap.has(sale_id)) {
+        reactionsMap.get(sale_id)[content] = _count.content;
+      } else {
+        reactionsMap.set(sale_id, { [content]: _count.content });
+      }
+    });
+
+    const salesWithReactions = sales.map((sale) => ({
+      ...sale,
+      reactions: reactionsMap.get(sale.id) || null,
+    }));
+
+    return {
+      totalCount,
+      sales: salesWithReactions,
+    };
   }
 
   findOne(id: string) {
@@ -100,5 +132,25 @@ export class SalesService {
 
   remove(id: string) {
     return this.prisma.sale.delete({ where: { id } });
+  }
+
+  createReaction(
+    user_id: string,
+    sale_id: string,
+    createSaleReactionDto: CreateSaleReactionDto,
+  ) {
+    return this.prisma.saleReaction.create({
+      data: {
+        user_id,
+        sale_id,
+        ...createSaleReactionDto,
+      },
+    });
+  }
+
+  removeReaction(user_id: string, sale_id: string, content: string) {
+    return this.prisma.saleReaction.deleteMany({
+      where: { user_id, sale_id, content },
+    });
   }
 }

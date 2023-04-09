@@ -13,9 +13,9 @@ export class AssignRetailerDto {
   @IsPositive()
   price: number;
 
-  @IsNotEmpty()
+  @IsOptional()
   @IsBoolean()
-  available: boolean;
+  available?: boolean;
 
   @IsNotEmpty()
   @IsString()

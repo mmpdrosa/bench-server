@@ -84,11 +84,17 @@ export class ProductsController {
     @Query('search') search = 'all',
     @Query('category') category = 'all',
     @Query('subcategory') subcategory = 'all',
+    @Query('order') order = 'default',
+    @Query('skip') skip,
+    @Query('take') take,
   ) {
     return this.productsService.findProductsWithMinPrice(
       search,
       category,
       subcategory,
+      order,
+      skip,
+      take,
     );
   }
 

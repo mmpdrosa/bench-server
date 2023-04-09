@@ -9,8 +9,8 @@ import {
   Post,
   Req,
 } from '@nestjs/common';
-import { CreateProductNotificationDto } from './dto/create-product-notification.dto';
 
+import { CreateProductNotificationDto } from './dto/create-product-notification.dto';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UsersService } from './users.service';
 
@@ -97,5 +97,12 @@ export class UsersController {
     const { id: user_id } = req['user'];
 
     return this.usersService.findAllUserCategoryNotifications(user_id);
+  }
+
+  @Get('sales-reactions/for-all')
+  findAllUserSalesReactions(@Req() req) {
+    const { id: user_id } = req['user'];
+
+    return this.usersService.findAllUserSalesReactions(user_id);
   }
 }

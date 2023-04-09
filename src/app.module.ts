@@ -70,6 +70,8 @@ export class AppModule implements NestModule {
         'users/toggle-category-notification',
         'users/category-notifications',
         'users/role/admin',
+        'users/sales-reactions/for-all',
+        'sales/:sale_id/reactions',
       );
   }
 }

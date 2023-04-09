@@ -306,6 +306,9 @@ export class ProductsService {
     search: string,
     category_id: string,
     subcategory_id: string,
+    order: string,
+    skip: number,
+    take: number,
   ) {
     const where = { product: {}, AND: [] };
 
@@ -356,6 +359,8 @@ export class ProductsService {
         retailer: true,
         coupon: true,
       },
+      skip,
+      take,
     });
 
     const res = products.map(
