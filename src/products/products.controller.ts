@@ -122,4 +122,9 @@ export class ProductsController {
       retailer_id,
     );
   }
+
+  @Get(':product_id/sales')
+  findAllSales(@Param('product_id', ParseUUIDPipe) product_id: string) {
+    return this.productsService.findAllSales(product_id);
+  }
 }

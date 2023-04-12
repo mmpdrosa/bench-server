@@ -95,7 +95,7 @@ export class ProductsService {
                 price / 100,
               )}. Compre agora e economize!`,
               data: {
-                url: `/products/${product_id}`,
+                url: `/produto/${product_id}`,
               },
             };
 
@@ -343,6 +343,8 @@ export class ProductsService {
 
     const products = await this.prisma.productRetailer.findMany({
       where,
+      distinct: ['product_id'],
+      orderBy: { price: 'asc' },
       select: {
         price: true,
         available: true,
@@ -363,92 +365,41 @@ export class ProductsService {
       take,
     });
 
-    const res = products.map(
-      ({
-        product: {
-          id,
-          title,
-          reference_price,
-          image_url,
-          recommended,
-          productCategory,
-          productSubcategory,
-        },
-        ...data
-      }) => {
-        return {
-          id,
-          title,
-          reference_price,
-          image_url,
-          recommended,
-          ...data,
-          category: productCategory ? productCategory.category : null,
-          subcategory: productSubcategory
-            ? productSubcategory.subcategory
-            : null,
-        };
-      },
+    return products.map(({ product: productData, ...sellerData }) =>
+      this.mapWithCategoryAndSubcategory({
+        ...productData,
+        ...sellerData,
+      }),
     );
-
-    return res.reduce((acc, curr) => {
-      const existingProduct = acc.find((product) => product.id === curr.id);
-      if (!existingProduct) {
-        acc.push(curr);
-      } else if (curr.price < existingProduct.price) {
-        acc.splice(acc.indexOf(existingProduct), 1, curr);
-      }
-      return acc;
-    }, []);
   }
 
   async findProductWithMinPrice(product_id: string) {
-    const {
-      product: {
-        id,
-        title,
-        reference_price,
-        image_url,
-        recommended,
-        specs,
-        review_url,
-        productCategory,
-        productSubcategory,
-      },
-      ...data
-    } = await this.prisma.productRetailer.findFirstOrThrow({
-      where: { product: { id: product_id } },
-      orderBy: { price: 'asc' },
-      select: {
-        price: true,
-        available: true,
-        html_url: true,
-        dummy: true,
-        created_at: true,
-        updated_at: true,
-        product: {
-          include: {
-            productCategory: { include: { category: true } },
-            productSubcategory: { include: { subcategory: true } },
+    const { product: productData, ...sellerData } =
+      await this.prisma.productRetailer.findFirstOrThrow({
+        where: { product: { id: product_id } },
+        orderBy: { price: 'asc' },
+        select: {
+          price: true,
+          available: true,
+          html_url: true,
+          dummy: true,
+          created_at: true,
+          updated_at: true,
+          product: {
+            include: {
+              productCategory: { include: { category: true } },
+              productSubcategory: { include: { subcategory: true } },
+            },
           },
+          retailer: true,
+          coupon: true,
         },
-        retailer: true,
-        coupon: true,
-      },
-    });
+      });
 
-    return {
-      id,
-      title,
-      reference_price,
-      recommended,
-      specs,
-      review_url,
-      image_url,
-      ...data,
-      category: productCategory ? productCategory.category : null,
-      subcategory: productSubcategory ? productSubcategory.subcategory : null,
-    };
+    return this.mapWithCategoryAndSubcategory({
+      ...productData,
+      ...sellerData,
+    });
   }
 
   findProductPriceHistory(product_id: string) {
@@ -462,6 +413,21 @@ export class ProductsService {
           product_id,
           retailer_id,
         },
+      },
+    });
+  }
+
+  findAllSales(product_id: string) {
+    return this.prisma.sale.findMany({
+      where: { product_id },
+      orderBy: { created_at: 'desc' },
+      select: {
+        id: true,
+        price: true,
+        image_url: true,
+        html_url: true,
+        coupon: true,
+        created_at: true,
       },
     });
   }
