@@ -403,7 +403,10 @@ export class ProductsService {
   }
 
   findProductPriceHistory(product_id: string) {
-    return this.prisma.productPriceHistory.findMany({ where: { product_id } });
+    return this.prisma.productPriceHistory.findMany({
+      where: { product_id },
+      orderBy: { date: 'asc' },
+    });
   }
 
   removeProductRetailerRelation(product_id: string, retailer_id: string) {
