@@ -29,7 +29,7 @@ export class ProductsService {
     available: boolean,
     price: number,
   ) {
-    const today = dayjs().startOf('day');
+    const today = dayjs().tz().startOf('day');
 
     const register = await this.prisma.productPriceHistory.findFirst({
       where: {
