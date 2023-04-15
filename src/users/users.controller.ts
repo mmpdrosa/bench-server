@@ -8,8 +8,10 @@ import {
   Patch,
   Post,
   Req,
+  UseInterceptors,
 } from '@nestjs/common';
 
+import { ApiKeyInterceptor } from 'src/api-key.interceptor';
 import { CreateProductNotificationDto } from './dto/create-product-notification.dto';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UsersService } from './users.service';
@@ -24,21 +26,26 @@ export class UsersController {
   }
 
   @Get()
+  @UseInterceptors(ApiKeyInterceptor)
   findAll() {
     return this.usersService.findAll();
   }
 
   @Get(':id')
+  @UseInterceptors(ApiKeyInterceptor)
   findOne(@Param('id') id: string) {
     return this.usersService.findOne(id);
   }
 
   @Delete(':id')
-  remove(@Param('id') id: string) {
+  remove(@Req() req) {
+    const { id } = req['user'];
+
     return this.usersService.remove(id);
   }
 
   @Patch(':id/make-admin')
+  @UseInterceptors(ApiKeyInterceptor)
   makeUserAdmin(@Param('id') id: string) {
     return this.usersService.makeUserAdmin(id);
   }

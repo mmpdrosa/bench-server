@@ -7,10 +7,10 @@ import {
 } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
 import { APP_FILTER, HttpAdapterHost } from '@nestjs/core';
-import { PrismaClientExceptionFilter } from 'nestjs-prisma';
 import dayjs from 'dayjs';
 import timezone from 'dayjs/plugin/timezone';
 import utc from 'dayjs/plugin/utc';
+import { PrismaClientExceptionFilter } from 'nestjs-prisma';
 
 import { AppController } from './app.controller';
 import { AuthMiddleware } from './auth/auth.middleware';
@@ -64,13 +64,14 @@ export class AppModule implements NestModule {
       .forRoutes(
         { path: 'subscriptions', method: RequestMethod.POST },
         { path: 'subscriptions', method: RequestMethod.DELETE },
+        { path: 'users', method: RequestMethod.DELETE },
+        'users/role/admin',
         'users/notify-product',
-        'users/product-notifications',
         'users/unnotify-product',
+        'users/product-notifications',
         'users/toggle-category-notification',
         'users/category-notifications',
-        'users/role/admin',
-        'users/sales-reactions/for-all',
+        'users/sales-reactions',
         'sales/:sale_id/reactions',
       );
   }

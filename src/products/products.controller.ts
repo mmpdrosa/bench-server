@@ -8,8 +8,10 @@ import {
   Patch,
   Post,
   Query,
+  UseInterceptors,
 } from '@nestjs/common';
 
+import { ApiKeyInterceptor } from 'src/api-key.interceptor';
 import { AssignRetailerDto } from './dto/assign-retailer.dto';
 import { CreateProductDto } from './dto/create-product.dto';
 import { UpdateProductRetailerDto } from './dto/update-product-retailer.dto';
@@ -21,6 +23,7 @@ export class ProductsController {
   constructor(private readonly productsService: ProductsService) {}
 
   @Post()
+  @UseInterceptors(ApiKeyInterceptor)
   create(@Body() createProductDto: CreateProductDto) {
     return this.productsService.create(createProductDto);
   }
@@ -36,6 +39,7 @@ export class ProductsController {
   }
 
   @Patch(':id')
+  @UseInterceptors(ApiKeyInterceptor)
   update(
     @Param('id', ParseUUIDPipe) id: string,
     @Body() updateProductDto: UpdateProductDto,
@@ -44,11 +48,13 @@ export class ProductsController {
   }
 
   @Delete(':id')
+  @UseInterceptors(ApiKeyInterceptor)
   remove(@Param('id', ParseUUIDPipe) id: string) {
     return this.productsService.remove(id);
   }
 
   @Post(':product_id/retailers/:retailer_id')
+  @UseInterceptors(ApiKeyInterceptor)
   assignRetailer(
     @Param('product_id', ParseUUIDPipe) product_id: string,
     @Param('retailer_id', ParseUUIDPipe) retailer_id: string,
@@ -67,6 +73,7 @@ export class ProductsController {
   }
 
   @Patch(':product_id/retailers/:retailer_id')
+  @UseInterceptors(ApiKeyInterceptor)
   updateProductRetailerRelation(
     @Param('product_id', ParseUUIDPipe) product_id: string,
     @Param('retailer_id', ParseUUIDPipe) retailer_id: string,
@@ -113,6 +120,7 @@ export class ProductsController {
   }
 
   @Delete(':product_id/retailers/:retailer_id')
+  @UseInterceptors(ApiKeyInterceptor)
   removeProductRetailerRelation(
     @Param('product_id', ParseUUIDPipe) product_id: string,
     @Param('retailer_id', ParseUUIDPipe) retailer_id: string,

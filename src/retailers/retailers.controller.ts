@@ -7,8 +7,10 @@ import {
   ParseUUIDPipe,
   Patch,
   Post,
+  UseInterceptors,
 } from '@nestjs/common';
 
+import { ApiKeyInterceptor } from 'src/api-key.interceptor';
 import { CreateRetailerDto } from './dto/create-retailer.dto';
 import { UpdateRetailerDto } from './dto/update-retailer.dto';
 import { RetailersService } from './retailers.service';
@@ -18,6 +20,7 @@ export class RetailersController {
   constructor(private readonly retailersService: RetailersService) {}
 
   @Post()
+  @UseInterceptors(ApiKeyInterceptor)
   create(@Body() createRetailerDto: CreateRetailerDto) {
     return this.retailersService.create(createRetailerDto);
   }
@@ -33,6 +36,7 @@ export class RetailersController {
   }
 
   @Patch(':id')
+  @UseInterceptors(ApiKeyInterceptor)
   update(
     @Param('id', ParseUUIDPipe) id: string,
     @Body() updateRetailerDto: UpdateRetailerDto,
@@ -41,6 +45,7 @@ export class RetailersController {
   }
 
   @Delete(':id')
+  @UseInterceptors(ApiKeyInterceptor)
   remove(@Param('id', ParseUUIDPipe) id: string) {
     return this.retailersService.remove(id);
   }

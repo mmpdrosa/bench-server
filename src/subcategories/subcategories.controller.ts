@@ -7,8 +7,10 @@ import {
   ParseUUIDPipe,
   Patch,
   Post,
+  UseInterceptors,
 } from '@nestjs/common';
 
+import { ApiKeyInterceptor } from 'src/api-key.interceptor';
 import { CreateSubcategoryDto } from './dto/create-subcategory.dto';
 import { UpdateSubcategoryDto } from './dto/update-subcategory.dto';
 import { SubcategoriesService } from './subcategories.service';
@@ -18,6 +20,7 @@ export class SubcategoriesController {
   constructor(private readonly subcategoriesService: SubcategoriesService) {}
 
   @Post()
+  @UseInterceptors(ApiKeyInterceptor)
   create(@Body() createSubcategoryDto: CreateSubcategoryDto) {
     return this.subcategoriesService.create(createSubcategoryDto);
   }
@@ -33,6 +36,7 @@ export class SubcategoriesController {
   }
 
   @Patch(':id')
+  @UseInterceptors(ApiKeyInterceptor)
   update(
     @Param('id', ParseUUIDPipe) id: string,
     @Body() updateSubcategoryDto: UpdateSubcategoryDto,
@@ -41,6 +45,7 @@ export class SubcategoriesController {
   }
 
   @Delete(':id')
+  @UseInterceptors(ApiKeyInterceptor)
   remove(@Param('id', ParseUUIDPipe) id: string) {
     return this.subcategoriesService.remove(id);
   }

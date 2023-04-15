@@ -1,7 +1,6 @@
 import {
   Body,
   Controller,
-  DefaultValuePipe,
   Delete,
   Get,
   Param,
@@ -11,18 +10,21 @@ import {
   Post,
   Query,
   Req,
+  UseInterceptors,
 } from '@nestjs/common';
 
+import { ApiKeyInterceptor } from 'src/api-key.interceptor';
+import { CreateSaleReactionDto } from './dto/create-sale-reaction.dto';
 import { CreateSaleDto } from './dto/create-sale.dto';
 import { UpdateSaleDto } from './dto/update-sale.dto';
 import { SalesService } from './sales.service';
-import { CreateSaleReactionDto } from './dto/create-sale-reaction.dto';
 
 @Controller('sales')
 export class SalesController {
   constructor(private readonly salesService: SalesService) {}
 
   @Post()
+  @UseInterceptors(ApiKeyInterceptor)
   create(@Body() createSaleDto: CreateSaleDto) {
     return this.salesService.create(createSaleDto);
   }
@@ -42,6 +44,7 @@ export class SalesController {
   }
 
   @Patch(':id')
+  @UseInterceptors(ApiKeyInterceptor)
   update(
     @Param('id', ParseUUIDPipe) id: string,
     @Body() updateSaleDto: UpdateSaleDto,
@@ -50,6 +53,7 @@ export class SalesController {
   }
 
   @Delete(':id')
+  @UseInterceptors(ApiKeyInterceptor)
   remove(@Param('id', ParseUUIDPipe) id: string) {
     return this.salesService.remove(id);
   }
