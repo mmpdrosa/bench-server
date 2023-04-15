@@ -7,7 +7,7 @@ WORKDIR /usr/src/app
 COPY package*.json ./
 COPY prisma ./prisma/
 
-RUN npm install --omit=dev
+RUN npm ci
 
 COPY . .
 
@@ -22,5 +22,8 @@ COPY --from=builder /usr/src/app/package*.json ./
 COPY --from=builder /usr/src/app/prisma ./prisma
 COPY --from=builder /usr/src/app/dist ./dist
 
+RUN npx prisma migrate deploy
+
 EXPOSE 3333
+
 CMD [ "npm", "run", "start:prod" ]
