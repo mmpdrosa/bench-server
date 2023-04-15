@@ -3,21 +3,20 @@ services:
   app:
     container_name: bench-server
     build:
-      context: .
-      dockerfile: Dockerfile
+      context: ./
     ports:
       - 3333:3333
     depends_on:
       - postgres
     env_file:
-      - .env.production
+      - ./.env.production
 
   postgres:
     image: postgres:latest
     container_name: postgres
     restart: always
     env_file:
-      - .env.production
+      - ./.env.production
     ports:
       - ${DB_PORT}:5432
     volumes:

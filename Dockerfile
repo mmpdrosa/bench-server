@@ -9,6 +9,8 @@ COPY prisma ./prisma/
 
 RUN npm ci
 
+RUN npx prisma migrate deploy
+
 COPY . .
 
 RUN npm run build
@@ -19,10 +21,7 @@ WORKDIR /usr/src/app
 
 COPY --from=builder /usr/src/app/node_modules ./node_modules
 COPY --from=builder /usr/src/app/package*.json ./
-COPY --from=builder /usr/src/app/prisma ./prisma
 COPY --from=builder /usr/src/app/dist ./dist
-
-RUN npx prisma migrate deploy
 
 EXPOSE 3333
 
