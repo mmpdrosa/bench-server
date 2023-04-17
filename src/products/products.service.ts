@@ -34,7 +34,7 @@ export class ProductsService {
     const register = await this.prisma.productPriceHistory.findFirst({
       where: {
         product_id,
-        date: { gte: today.toDate(), lt: today.add(1, 'day').toDate() },
+        date: { equals: today.toDate() },
       },
       orderBy: { date: 'desc' },
     });
