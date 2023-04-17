@@ -9,6 +9,7 @@ import {
   Post,
   UseInterceptors,
 } from '@nestjs/common';
+import { ApiSecurity } from '@nestjs/swagger';
 
 import { ApiKeyInterceptor } from 'src/api-key.interceptor';
 import { CouponsService } from './coupons.service';
@@ -21,6 +22,7 @@ export class CouponsController {
 
   @Post()
   @UseInterceptors(ApiKeyInterceptor)
+  @ApiSecurity('api-key')
   create(@Body() createCouponDto: CreateCouponDto) {
     return this.couponsService.create(createCouponDto);
   }
@@ -37,6 +39,7 @@ export class CouponsController {
 
   @Patch(':id')
   @UseInterceptors(ApiKeyInterceptor)
+  @ApiSecurity('api-key')
   update(
     @Param('id', ParseUUIDPipe) id: string,
     @Body() updateCouponDto: UpdateCouponDto,
@@ -46,6 +49,7 @@ export class CouponsController {
 
   @Delete(':id')
   @UseInterceptors(ApiKeyInterceptor)
+  @ApiSecurity('api-key')
   remove(@Param('id', ParseUUIDPipe) id: string) {
     return this.couponsService.remove(id);
   }

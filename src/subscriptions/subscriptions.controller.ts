@@ -7,6 +7,7 @@ import {
   Req,
   UseInterceptors,
 } from '@nestjs/common';
+import { ApiSecurity } from '@nestjs/swagger';
 
 import { ApiKeyInterceptor } from 'src/api-key.interceptor';
 import { CreateSubscriptionDto } from './dto/create-subscription.dto';
@@ -30,6 +31,7 @@ export class SubscriptionsController {
 
   @Get()
   @UseInterceptors(ApiKeyInterceptor)
+  @ApiSecurity('api-key')
   findAll() {
     return this.subscriptionsService.findAll();
   }

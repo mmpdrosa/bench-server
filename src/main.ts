@@ -22,7 +22,7 @@ async function bootstrap() {
     .setTitle('Bench')
     .setDescription('The Bench API description')
     .setVersion('1.0')
-    .addApiKey({ type: 'apiKey', name: 'api-key', in: 'header' })
+    .addApiKey({ type: 'apiKey', name: 'api-key', in: 'header' }, 'api-key')
     .build();
   const document = SwaggerModule.createDocument(app, config);
   SwaggerModule.setup('api', app, document);

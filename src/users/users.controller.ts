@@ -10,6 +10,7 @@ import {
   Req,
   UseInterceptors,
 } from '@nestjs/common';
+import { ApiSecurity } from '@nestjs/swagger';
 
 import { ApiKeyInterceptor } from 'src/api-key.interceptor';
 import { CreateProductNotificationDto } from './dto/create-product-notification.dto';
@@ -27,12 +28,14 @@ export class UsersController {
 
   @Get()
   @UseInterceptors(ApiKeyInterceptor)
+  @ApiSecurity('api-key')
   findAll() {
     return this.usersService.findAll();
   }
 
   @Get(':id')
   @UseInterceptors(ApiKeyInterceptor)
+  @ApiSecurity('api-key')
   findOne(@Param('id') id: string) {
     return this.usersService.findOne(id);
   }
@@ -46,6 +49,7 @@ export class UsersController {
 
   @Patch(':id/make-admin')
   @UseInterceptors(ApiKeyInterceptor)
+  @ApiSecurity('api-key')
   makeUserAdmin(@Param('id') id: string) {
     return this.usersService.makeUserAdmin(id);
   }

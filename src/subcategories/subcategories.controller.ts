@@ -9,6 +9,7 @@ import {
   Post,
   UseInterceptors,
 } from '@nestjs/common';
+import { ApiSecurity } from '@nestjs/swagger';
 
 import { ApiKeyInterceptor } from 'src/api-key.interceptor';
 import { CreateSubcategoryDto } from './dto/create-subcategory.dto';
@@ -21,6 +22,7 @@ export class SubcategoriesController {
 
   @Post()
   @UseInterceptors(ApiKeyInterceptor)
+  @ApiSecurity('api-key')
   create(@Body() createSubcategoryDto: CreateSubcategoryDto) {
     return this.subcategoriesService.create(createSubcategoryDto);
   }
@@ -37,6 +39,7 @@ export class SubcategoriesController {
 
   @Patch(':id')
   @UseInterceptors(ApiKeyInterceptor)
+  @ApiSecurity('api-key')
   update(
     @Param('id', ParseUUIDPipe) id: string,
     @Body() updateSubcategoryDto: UpdateSubcategoryDto,
@@ -46,6 +49,7 @@ export class SubcategoriesController {
 
   @Delete(':id')
   @UseInterceptors(ApiKeyInterceptor)
+  @ApiSecurity('api-key')
   remove(@Param('id', ParseUUIDPipe) id: string) {
     return this.subcategoriesService.remove(id);
   }

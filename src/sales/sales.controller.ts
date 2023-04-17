@@ -12,6 +12,7 @@ import {
   Req,
   UseInterceptors,
 } from '@nestjs/common';
+import { ApiSecurity } from '@nestjs/swagger';
 
 import { ApiKeyInterceptor } from 'src/api-key.interceptor';
 import { CreateSaleReactionDto } from './dto/create-sale-reaction.dto';
@@ -25,6 +26,7 @@ export class SalesController {
 
   @Post()
   @UseInterceptors(ApiKeyInterceptor)
+  @ApiSecurity('api-key')
   create(@Body() createSaleDto: CreateSaleDto) {
     return this.salesService.create(createSaleDto);
   }
@@ -45,6 +47,7 @@ export class SalesController {
 
   @Patch(':id')
   @UseInterceptors(ApiKeyInterceptor)
+  @ApiSecurity('api-key')
   update(
     @Param('id', ParseUUIDPipe) id: string,
     @Body() updateSaleDto: UpdateSaleDto,
@@ -54,6 +57,7 @@ export class SalesController {
 
   @Delete(':id')
   @UseInterceptors(ApiKeyInterceptor)
+  @ApiSecurity('api-key')
   remove(@Param('id', ParseUUIDPipe) id: string) {
     return this.salesService.remove(id);
   }

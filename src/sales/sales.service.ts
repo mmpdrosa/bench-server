@@ -3,9 +3,9 @@ import { PrismaService } from 'nestjs-prisma';
 import webpush from 'web-push';
 
 import { priceFormatter } from '../utils/formatter';
+import { CreateSaleReactionDto } from './dto/create-sale-reaction.dto';
 import { CreateSaleDto } from './dto/create-sale.dto';
 import { UpdateSaleDto } from './dto/update-sale.dto';
-import { CreateSaleReactionDto } from './dto/create-sale-reaction.dto';
 
 @Injectable()
 export class SalesService {
@@ -144,8 +144,14 @@ export class SalesService {
   }
 
   removeReaction(user_id: string, sale_id: string, content: string) {
-    return this.prisma.saleReaction.deleteMany({
-      where: { user_id, sale_id, content },
+    return this.prisma.saleReaction.delete({
+      where: {
+        user_id_sale_id_content: {
+          user_id,
+          sale_id,
+          content,
+        },
+      },
     });
   }
 }
