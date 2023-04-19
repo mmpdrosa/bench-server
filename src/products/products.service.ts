@@ -24,7 +24,7 @@ export class ProductsService {
     return { ...data, category, subcategory };
   }
 
-  private async updateProductDailyPrice(
+  public async updateProductDailyPrice(
     product_id: string,
     available: boolean,
     price: number,

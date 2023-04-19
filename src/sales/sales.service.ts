@@ -2,6 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { PrismaService } from 'nestjs-prisma';
 import webpush from 'web-push';
 
+import { ProductsService } from 'src/products/products.service';
 import { priceFormatter } from '../utils/formatter';
 import { CreateSaleReactionDto } from './dto/create-sale-reaction.dto';
 import { CreateSaleDto } from './dto/create-sale.dto';
@@ -9,7 +10,10 @@ import { UpdateSaleDto } from './dto/update-sale.dto';
 
 @Injectable()
 export class SalesService {
-  constructor(private prisma: PrismaService) {}
+  constructor(
+    private prisma: PrismaService,
+    private productsService: ProductsService,
+  ) {}
 
   private async sendCategoryNotification(
     category_id: string,
@@ -69,6 +73,14 @@ export class SalesService {
       sale.title,
       sale.price,
     );
+
+    if (sale.product_id) {
+      await this.productsService.updateProductDailyPrice(
+        sale.product_id,
+        true,
+        sale.price,
+      );
+    }
 
     return sale;
   }
