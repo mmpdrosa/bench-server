@@ -225,11 +225,7 @@ export class ProductsService {
       data: { product_id, retailer_id, ...assignRetailerDto },
     });
 
-    await this.updateProductDailyPrice(
-      product_id,
-      product.available,
-      product.price,
-    );
+    await this.updateProductRetailerRelation(product_id, retailer_id, {});
 
     return product;
   }
@@ -265,6 +261,10 @@ export class ProductsService {
       }
     }
 
+    const beforeLowestPriceProduct = await this.findProductWithMinPrice(
+      product_id,
+    );
+
     const productRetailer = await this.prisma.productRetailer.update({
       where: {
         product_id_retailer_id: {
@@ -281,22 +281,36 @@ export class ProductsService {
       },
     });
 
-    if ((productRetailer.available && data.price) || data.available) {
+    const afterLowestPriceProduct = await this.findProductWithMinPrice(
+      product_id,
+    );
+
+    // produto está disponível e o preço antes da atualização é diferente do preço depois da atualização
+    // ou produto ficou disponivel
+    // estou deixando notificar mesmo se o preço depois da atualização é maior
+    if (
+      (afterLowestPriceProduct.available &&
+        beforeLowestPriceProduct.price !== afterLowestPriceProduct) ||
+      (!beforeLowestPriceProduct.available && afterLowestPriceProduct.available)
+    ) {
       try {
         await this.sendProductNotification(
           product_id,
-          productRetailer.product.title,
-          productRetailer.price,
+          afterLowestPriceProduct.title,
+          afterLowestPriceProduct.price,
         );
       } catch (err) {
         throw new InternalServerErrorException(err);
       }
     }
 
+    // mudar o histórico do dia pegando sempre o produto com o menor preço
     await this.updateProductDailyPrice(
       product_id,
-      productRetailer.available,
-      productRetailer.price,
+      afterLowestPriceProduct.available,
+      beforeLowestPriceProduct.available && !afterLowestPriceProduct.available
+        ? beforeLowestPriceProduct.price
+        : afterLowestPriceProduct.price,
     );
 
     return productRetailer;
@@ -344,7 +358,7 @@ export class ProductsService {
     const products = await this.prisma.productRetailer.findMany({
       where,
       distinct: ['product_id'],
-      orderBy: { price: 'asc' },
+      orderBy: [{ available: 'desc' }, { price: 'asc' }],
       select: {
         price: true,
         available: true,
@@ -377,7 +391,7 @@ export class ProductsService {
     const { product: productData, ...sellerData } =
       await this.prisma.productRetailer.findFirstOrThrow({
         where: { product: { id: product_id } },
-        orderBy: { price: 'asc' },
+        orderBy: [{ available: 'desc' }, { price: 'asc' }],
         select: {
           price: true,
           available: true,

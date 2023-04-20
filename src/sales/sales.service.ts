@@ -45,7 +45,7 @@ export class SalesService {
                 productPrice / 100,
               )}. Corra e compre já!`,
               data: {
-                url: `/sales`,
+                url: `/promocoes`,
               },
             };
 
