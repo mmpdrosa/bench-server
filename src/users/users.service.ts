@@ -24,25 +24,21 @@ export class UsersService {
 
   async create({ email, password, photo_url, username }: CreateUserDto) {
     try {
-      const user = await this.firebase.auth.getUserByEmail(email);
+      const user = await this.firebase.auth.createUser({
+        displayName: username,
+        email,
+        password,
+        photoURL: photo_url,
+      });
 
-      if (user) {
-        throw new ConflictException('This email address is already in use');
-      }
+      const token = await this.firebase.auth.createCustomToken(user.uid);
+
+      return token;
     } catch (err) {
-      if (err.code !== 'auth/user-not-found') {
-        throw new NotFoundException(err);
+      if (err.code === 'auth/email-already-exists') {
+        throw new ConflictException({ code: 'auth/email-already-exists' });
       }
     }
-
-    const user = await this.firebase.auth.createUser({
-      displayName: username,
-      email,
-      password,
-      photoURL: photo_url,
-    });
-
-    return this.mapUser(user);
   }
 
   async findAll() {
