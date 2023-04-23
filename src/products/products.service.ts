@@ -28,10 +28,11 @@ export class ProductsService {
     product_id: string,
     available: boolean,
     price: number,
+    isPriceFromSale: boolean,
   ) {
     const today = dayjs().tz().startOf('day');
 
-    const register = await this.prisma.productPriceHistory.findFirst({
+    const todayRegister = await this.prisma.productPriceHistory.findFirst({
       where: {
         product_id,
         date: { equals: today.toDate() },
@@ -39,25 +40,39 @@ export class ProductsService {
       orderBy: { date: 'desc' },
     });
 
-    if (register) {
+    if (todayRegister) {
       await this.prisma.productPriceHistory.update({
-        where: { id: register.id },
+        where: { id: todayRegister.id },
         data: {
           last_availability: available,
-          was_available: register.was_available ? true : available,
+          was_available: todayRegister.was_available ? true : available,
           lowest_price:
-            register.lowest_price > price ? price : register.lowest_price,
-          last_price: price,
+            todayRegister.lowest_price > price
+              ? price
+              : todayRegister.lowest_price,
+          last_price: isPriceFromSale ? todayRegister.last_price : price,
         },
       });
     } else {
+      let last_price = price;
+      if (isPriceFromSale) {
+        const lastRegister = await this.prisma.productPriceHistory.findFirst({
+          where: {
+            product_id,
+          },
+          orderBy: { date: 'desc' },
+        });
+
+        last_price = lastRegister.last_price;
+      }
+
       await this.prisma.productPriceHistory.create({
         data: {
           product_id,
           was_available: available,
           last_availability: available,
           lowest_price: price,
-          last_price: price,
+          last_price,
           date: today.toDate(),
         },
       });
@@ -311,6 +326,7 @@ export class ProductsService {
       beforeLowestPriceProduct.available && !afterLowestPriceProduct.available
         ? beforeLowestPriceProduct.price
         : afterLowestPriceProduct.price,
+      false,
     );
 
     return productRetailer;

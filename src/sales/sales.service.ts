@@ -79,6 +79,7 @@ export class SalesService {
         sale.product_id,
         true,
         sale.price,
+        true,
       );
     }
 
