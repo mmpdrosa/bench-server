@@ -16,6 +16,7 @@ export class SalesService {
   ) {}
 
   private async sendCategoryNotification(
+    saleId: string,
     category_id: string,
     categoryName: string,
     productTitle: string,
@@ -45,7 +46,7 @@ export class SalesService {
                 productPrice / 100,
               )}. Corra e compre já!`,
               data: {
-                url: `/promocoes`,
+                url: `#${saleId}`,
               },
             };
 
@@ -68,6 +69,7 @@ export class SalesService {
     });
 
     await this.sendCategoryNotification(
+      sale.id,
       sale.category_id,
       sale.category.name,
       sale.title,

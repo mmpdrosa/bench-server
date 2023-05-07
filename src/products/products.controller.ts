@@ -18,6 +18,8 @@ import { CreateProductDto } from './dto/create-product.dto';
 import { UpdateProductRetailerDto } from './dto/update-product-retailer.dto';
 import { UpdateProductDto } from './dto/update-product.dto';
 import { ProductsService } from './products.service';
+import { UpdateProductHistoryByDateDto } from './dto/update-product-history-by-date.dto';
+import { RemoveProductHistoryByDateDto } from './dto/remove-product-history-by-date.dto';
 
 @Controller('products')
 export class ProductsController {
@@ -123,6 +125,32 @@ export class ProductsController {
     @Param('product_id', ParseUUIDPipe) product_id: string,
   ) {
     return this.productsService.findProductPriceHistory(product_id);
+  }
+
+  @Patch(':product_id/price-history')
+  @UseInterceptors(ApiKeyInterceptor)
+  @ApiSecurity('api-key')
+  updateProductHistoryByDate(
+    @Param('product_id', ParseUUIDPipe) product_id: string,
+    @Body() updateProductHistoryByDateDto: UpdateProductHistoryByDateDto,
+  ) {
+    const { date, price } = updateProductHistoryByDateDto;
+    return this.productsService.updateProductHistoryByDate(
+      product_id,
+      date,
+      price,
+    );
+  }
+
+  @Delete(':product_id/price-history')
+  @UseInterceptors(ApiKeyInterceptor)
+  @ApiSecurity('api-key')
+  removeProductHistoryByDate(
+    @Param('product_id', ParseUUIDPipe) product_id: string,
+    @Body() removeProductHistoryByDateDto: RemoveProductHistoryByDateDto,
+  ) {
+    const { date } = removeProductHistoryByDateDto;
+    return this.productsService.removeProductHistoryByDate(product_id, date);
   }
 
   @Delete(':product_id/retailers/:retailer_id')

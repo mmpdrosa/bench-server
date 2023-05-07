@@ -439,6 +439,39 @@ export class ProductsService {
     });
   }
 
+  async updateProductHistoryByDate(
+    product_id: string,
+    date: string,
+    price: number,
+  ) {
+    const dayRegister = await this.prisma.productPriceHistory.findFirstOrThrow({
+      where: {
+        product_id,
+        date: { equals: dayjs(date).tz().startOf('day').toDate() },
+      },
+    });
+
+    return this.prisma.productPriceHistory.update({
+      where: { id: dayRegister.id },
+      data: {
+        lowest_price: price,
+      },
+    });
+  }
+
+  async removeProductHistoryByDate(product_id: string, date: string) {
+    const dayRegister = await this.prisma.productPriceHistory.findFirstOrThrow({
+      where: {
+        product_id,
+        date: { equals: dayjs(date).tz().startOf('day').toDate() },
+      },
+    });
+
+    return this.prisma.productPriceHistory.delete({
+      where: { id: dayRegister.id },
+    });
+  }
+
   removeProductRetailerRelation(product_id: string, retailer_id: string) {
     return this.prisma.productRetailer.delete({
       where: {
