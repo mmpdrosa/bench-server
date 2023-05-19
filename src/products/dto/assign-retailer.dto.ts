@@ -28,4 +28,7 @@ export class AssignRetailerDto {
   @IsOptional()
   @IsString()
   coupon_id?: string;
+
+  @IsOptional()
+  cashback?: string;
 }
