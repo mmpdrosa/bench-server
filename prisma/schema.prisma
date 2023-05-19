@@ -70,6 +70,7 @@ model ProductRetailer {
   product_id  String
   retailer_id String
   coupon_id   String?
+  cashback    Json?
 
   product  Product  @relation(fields: [product_id], references: [id], onDelete: Cascade)
   retailer Retailer @relation(fields: [retailer_id], references: [id], onDelete: Cascade)
