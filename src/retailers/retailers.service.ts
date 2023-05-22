@@ -43,6 +43,7 @@ export class RetailersService {
         dummy: true,
         created_at: true,
         updated_at: true,
+        cashback: true,
         product: {
           include: {
             productCategory: { include: { category: true } },
