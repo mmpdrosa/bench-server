@@ -257,6 +257,7 @@ export class ProductsService {
         updated_at: true,
         retailer: true,
         coupon: true,
+        cashback: true,
       },
     });
   }
