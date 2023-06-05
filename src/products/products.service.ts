@@ -306,7 +306,7 @@ export class ProductsService {
     // estou deixando notificar mesmo se o preço depois da atualização é maior
     if (
       (afterLowestPriceProduct.available &&
-        beforeLowestPriceProduct.price !== afterLowestPriceProduct) ||
+        beforeLowestPriceProduct.price !== afterLowestPriceProduct.price) ||
       (!beforeLowestPriceProduct.available && afterLowestPriceProduct.available)
     ) {
       try {
