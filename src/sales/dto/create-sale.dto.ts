@@ -45,4 +45,8 @@ export class CreateSaleDto {
   @IsOptional()
   @IsString()
   product_id?: string;
+
+  @IsOptional()
+  @IsString()
+  label?: string;
 }

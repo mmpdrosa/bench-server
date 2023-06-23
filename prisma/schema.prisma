@@ -29,6 +29,7 @@ model Product {
   image_url       String
   specs           Json?
   review_url      String?
+  description     String?
   recommended     Boolean @default(false)
 
   productCategory          ProductCategory?
@@ -153,6 +154,7 @@ model Sale {
   category_id String
   coupon      String?
   product_id  String?
+  label       String?
 
   category Category @relation(fields: [category_id], references: [id], onDelete: Cascade)
   product  Product? @relation(fields: [product_id], references: [id], onDelete: SetNull)
