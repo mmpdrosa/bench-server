@@ -490,14 +490,6 @@ export class ProductsService {
     return this.prisma.sale.findMany({
       where: { product_id },
       orderBy: { created_at: 'desc' },
-      select: {
-        id: true,
-        price: true,
-        image_url: true,
-        html_url: true,
-        coupon: true,
-        created_at: true,
-      },
     });
   }
 }
